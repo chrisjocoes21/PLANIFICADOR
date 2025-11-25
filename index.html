@@ -72,17 +72,23 @@
             overflow: hidden; /* Prohíbe scroll en el body */
         }
 
-        /* Scrollbar Oculta pero funcional */
-        .custom-scroll { 
-            overflow-y: auto;
-            -ms-overflow-style: none; /* IE and Edge */
-            scrollbar-width: none; /* Firefox */
-        }
-        /* Webkit browsers (Chrome, Safari) */
-        .custom-scroll::-webkit-scrollbar { 
-            display: none; 
+        /* --- SCROLL INVISIBLE GLOBAL (APLICADO A TODO) --- */
+        /* Ocultar scrollbar para Chrome, Safari y Opera */
+        *::-webkit-scrollbar {
+            display: none;
             width: 0 !important;
             height: 0 !important;
+        }
+
+        /* Ocultar scrollbar para IE, Edge y Firefox */
+        * {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        /* Clase utilitaria explícita por si acaso */
+        .custom-scroll { 
+            overflow-y: auto;
         }
 
         /* --- FONDO ANIMADO --- */
@@ -978,8 +984,8 @@
                 styleInstructions = `ESTILO: GAMIFICACIÓN. Usa dinámicas de juego, retos, recompensas y narrativa lúdica.`;
             }
             
-            // Se establece la concisión fija y MÁXIMA para ahorrar cuota
-            const promptConciseness = "SÉ EXTREMADAMENTE TELEGRÁFICO Y CONCISO. Solo presenta la estructura y el contenido de las clases directamente. Usa frases cortas. Ahorra tokens al máximo. Evita explicaciones meta sobre el estilo o la extensión.";
+            // Se establece la concisión para que sea MÁS DETALLADO por defecto
+            const promptConciseness = "Sé claro y explicativo. Describe las actividades con suficiente detalle para que el docente pueda ejecutarlas sin dudas, incluyendo breve contexto pedagógico si es necesario.";
             
             // Lógica Tareas Diarias (Flexible)
             const taskInstruction = hasHomework 
@@ -1057,25 +1063,8 @@
                 // 5. Renderizar
                 document.getElementById('plan-meta').textContent = `${subject} • ${groupDetails} • ${daysCount} Clases`;
                 
-                // --- NUEVA LÓGICA: CONSTRUIR RESUMEN HTML ANTES DEL MARKDOWN ---
-                // Se mantiene el resumen para que el usuario sepa qué generó.
-                const summaryHTML = `
-                <div class="mb-4 bg-blue-50 border border-blue-100 rounded-lg p-3 shadow-sm">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-2">
-                            <span class="w-1 h-4 bg-montessori-blue rounded-full"></span>
-                            <h2 class="text-sm font-bold text-montessori-blue font-montserrat">Resumen</h2>
-                        </div>
-                        <span class="text-[10px] font-bold text-montessori-red bg-white px-2 py-0.5 rounded border border-gray-100">${style}</span>
-                    </div>
-                    <div class="text-xs text-gray-700 space-y-1">
-                        <p><span class="font-bold text-gray-500 uppercase text-[9px] tracking-wider mr-1">Asignatura:</span> ${subject}</p>
-                        <p><span class="font-bold text-gray-500 uppercase text-[9px] tracking-wider mr-1">Grupo:</span> ${groupDetails}</p>
-                        <p class="italic text-gray-600 border-t border-gray-200 pt-1 mt-1"><span class="font-bold text-gray-500 uppercase text-[9px] tracking-wider mr-1">Temas:</span> "${topics}"</p>
-                    </div>
-                </div>`;
-                
-                document.getElementById('output-text').innerHTML = summaryHTML + marked.parse(aiText);
+                // --- NUEVA LÓGICA: SE ELIMINÓ EL RESUMEN ---
+                document.getElementById('output-text').innerHTML = marked.parse(aiText);
                 
                 document.getElementById('loader').classList.add('hidden');
                 
