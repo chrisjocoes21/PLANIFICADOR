@@ -62,31 +62,28 @@
         }
     </script>
     <style>
-        /* CONTROL DE LAYOUT PRINCIPAL - CRÍTICO PARA EL SCROLL */
+        /* CONTROL DE LAYOUT PRINCIPAL */
         body { 
             background-color: #f8fafc; 
             height: 100vh; 
             width: 100vw;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prohíbe scroll en el body */
+            overflow: hidden; 
         }
 
-        /* --- SCROLL INVISIBLE GLOBAL (APLICADO A TODO) --- */
-        /* Ocultar scrollbar para Chrome, Safari y Opera */
+        /* --- SCROLL INVISIBLE GLOBAL --- */
         *::-webkit-scrollbar {
             display: none;
             width: 0 !important;
             height: 0 !important;
         }
 
-        /* Ocultar scrollbar para IE, Edge y Firefox */
         * {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
 
-        /* Clase utilitaria explícita por si acaso */
         .custom-scroll { 
             overflow-y: auto;
         }
@@ -240,7 +237,7 @@
         }
         .animate-blue-red { animation: blueRedCycle 3s infinite cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* CUSTOM SELECT STYLES - CORREGIDOS */
+        /* CUSTOM SELECT STYLES */
         .custom-select-container { position: relative; width: 100%; }
         .custom-select-trigger { 
             display: flex; justify-content: space-between; align-items: center;
@@ -251,7 +248,7 @@
         }
         .custom-select-trigger:hover { border-color: #002060; }
         
-        /* Dropdown list styles updated for reliability */
+        /* Dropdown list styles */
         .custom-dropdown-list {
             position: absolute; 
             top: 100%; 
@@ -298,19 +295,7 @@
         </div>
     </div>
     
-    <!-- TIMEOUT SCREEN -->
-    <div id="timeout-screen" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-blue-50 overflow-hidden opacity-0 transition-opacity duration-500 ease-out">
-        <div class="animated-diagonal-background animate-diagonal-shift"></div>
-        <div class="particles-container z-10"><div class="grid-overlay"></div></div>
-        <div class="relative z-20 bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-white/50 max-w-lg w-full text-center transform transition-transform duration-500 scale-95" id="timeout-content">
-            <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 ring-4 ring-red-50/50">
-                <svg class="w-10 h-10 text-montessori-red" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800 mb-2">Sesión Finalizada por Inactividad</h3>
-            <p class="text-gray-600 text-sm mb-8 leading-relaxed">Para proteger la confidencialidad, la sesión ha finalizado. Presione el botón para volver a iniciar sesión.</p>
-            <button onclick="location.reload()" class="w-full bg-montessori-blue text-white font-bold py-3.5 rounded-xl shadow-lg hover:bg-blue-800 hover:shadow-montessori-blue/30 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0">Restablecer Sesión</button>
-        </div>
-    </div>
+    <!-- (ELIMINADO: Timeout Screen) -->
 
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-blue-50 overflow-hidden transition-all duration-700">
@@ -356,7 +341,7 @@
                             <div id="btn-loader" class="loader hidden absolute w-5 h-5 border-2"></div>
                         </button>
                     </form>
-                    <!-- BOTÓN DE SOPORTE AÑADIDO -->
+                    <!-- BOTÓN DE SOPORTE -->
                     <div class="mt-4 text-center">
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=gestion.educativa.pinceladas@gmail.com" target="_blank" class="text-[10px] text-gray-600 hover:text-montessori-blue transition-colors font-medium inline-flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -368,7 +353,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE ACCESO DENEGADO (RESTRICTED ACCESS) -->
+    <!-- MODAL DE ACCESO DENEGADO -->
     <div id="access-denied-modal" class="hidden fixed inset-0 z-[210] flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300 opacity-0">
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full mx-4 transform scale-95 transition-transform duration-300 border border-gray-100">
             <div class="text-center">
@@ -386,9 +371,28 @@
             </div>
         </div>
     </div>
+    
+    <!-- NUEVO MODAL: INSTRUCCIONES / COMENTARIOS (SIN ANIMACIÓN) -->
+    <div id="instructions-modal" class="hidden fixed inset-0 z-[250] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full mx-4 border border-gray-100 flex flex-col h-[70vh] md:h-auto">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
+                <h3 class="text-lg font-bold text-montessori-blue font-montserrat">Instrucciones Especiales</h3>
+                <button onclick="toggleInstructionsModal()" class="text-gray-400 hover:text-montessori-red transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="flex-1 flex flex-col gap-2">
+                <p class="text-xs text-gray-500 mb-2">Especifique materiales obligatorios, recursos concretos o adaptaciones que desee integrar. <span class="text-montessori-red font-bold">Estos requisitos se integrarán al plan.</span></p>
+                <textarea id="instructions-input" class="w-full flex-1 p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:border-montessori-blue focus:ring-2 focus:ring-blue-100 outline-none resize-none" placeholder="Ej: Usar material visual para matemáticas, incluir video sobre el ciclo del agua..."></textarea>
+            </div>
+            <div class="mt-4 flex justify-end gap-3">
+                <button onclick="toggleInstructionsModal()" class="px-4 py-2 text-sm text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancelar</button>
+                <button onclick="saveInstructions()" class="px-6 py-2 bg-montessori-blue text-white text-sm font-bold rounded-lg hover:bg-blue-800 transition-colors shadow-lg shadow-blue-900/20">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
 
-    <!-- APP PRINCIPAL (Oculta por defecto) -->
-    <!-- Layout principal: h-screen + flex-col para manejar cabecera, cuerpo y pie -->
+    <!-- APP PRINCIPAL -->
     <div id="app-content" class="hidden flex flex-col h-screen w-full relative z-0 opacity-0 transition-opacity duration-1000 overflow-hidden">
         
         <!-- Fondo -->
@@ -397,7 +401,7 @@
             <div class="particles-container z-10"><div class="grid-overlay"></div></div>
         </div>
 
-        <!-- HEADER (Fijo, no hace scroll) -->
+        <!-- HEADER -->
         <header class="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50 h-16 flex-shrink-0 w-full shadow-sm">
             <div class="w-full px-6 h-full flex justify-between items-center">
                 <div class="logo-container logo-sm select-none flex flex-col items-center cursor-pointer" onclick="location.reload()">
@@ -413,10 +417,8 @@
                     <div class="flex flex-col items-end mr-2">
                          <div class="flex items-center gap-1">
                              <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-tight">Hola,</span>
-                             <!-- Muestra el nombre completo, ajusta tamaño si es muy largo -->
                              <span id="user-name-display" class="text-xs font-black text-montessori-blue leading-tight max-w-[150px] truncate text-right">Usuario</span>
                          </div>
-                         <!-- ALINEACIÓN DE CONTADOR CORREGIDA -->
                          <div class="bg-blue-50 px-3 py-1 rounded-lg mt-1 border border-blue-100 flex items-center justify-center gap-2 h-6" id="quota-badge">
                              <span class="text-[10px] font-bold text-gray-500 uppercase leading-none">Usos hoy:</span>
                              <span id="usage-counter" class="text-xs font-black text-montessori-red leading-none pt-[1px]">...</span>
@@ -430,11 +432,9 @@
         </header>
 
         <!-- MAIN CONTENT -->
-        <!-- Ocupa el espacio restante entre header y footer. Maneja el layout de dos columnas. -->
         <main class="flex-1 w-full relative z-10 overflow-hidden flex flex-col md:flex-row p-4 md:p-6 gap-6 min-h-0">
             
-            <!-- PANEL IZQUIERDO: CONFIGURACIÓN (Scroll independiente si es necesario) -->
-            <!-- Aplicada la clase custom-scroll -->
+            <!-- PANEL IZQUIERDO: CONFIGURACIÓN -->
             <div class="w-full md:w-1/4 flex flex-col gap-4 overflow-y-auto custom-scroll pr-1 pb-20 md:pb-0 h-full flex-shrink-0">
                 <div class="bg-white/95 backdrop-blur rounded-2xl p-6 border border-white shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col h-full overflow-y-auto custom-scroll">
                     <!-- HEADER COMPACTO -->
@@ -449,13 +449,12 @@
                             <input type="text" id="subject" placeholder="Ingrese la Asignatura" required class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue text-sm font-medium">
                         </div>
                         
-                        <!-- CAMPO FUSIONADO: GRUPO (NIVEL Y EDAD) -->
                         <div>
                             <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Grupo (Nivel y Edad)</label>
                             <input type="text" id="groupDetails" placeholder="Ej. 3ro Primaria (8-9 años)" required class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue text-sm font-medium">
                         </div>
 
-                        <!-- SELECT MODERNIZADO (Custom) -->
+                        <!-- SELECT MODERNIZADO -->
                         <div class="relative custom-select-container">
                             <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Estilo Pedagógico</label>
                             <div id="style-dropdown-btn" class="custom-select-trigger" onclick="toggleDropdown('style')">
@@ -463,7 +462,6 @@
                                 <svg class="h-4 w-4 text-gray-600 transform transition-transform duration-200" id="style-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                             </div>
                             <div id="style-dropdown-list" class="custom-dropdown-list hidden">
-                                <!-- Options will be filled by JS -->
                                 <button type="button" onclick="selectDropdownValue('style', 'Tradicional')">Tradicional</button>
                                 <button type="button" onclick="selectDropdownValue('style', 'Montessori')">Montessori</button>
                                 <button type="button" onclick="selectDropdownValue('style', 'Gamificación')">Gamificación</button>
@@ -473,10 +471,8 @@
                             </div>
                             <input type="hidden" id="teachingStyle" value="Por Competencias">
                         </div>
-
-                        <!-- SE ELIMINA LA SECCIÓN DE EXTENSIÓN PARA REDUCIR CUOTA -->
                         
-                        <!-- NUEVO: TAREAS DIARIAS AHORA VA AL LADO DE ASIGNATURA (AJUSTE DE LAYOUT) -->
+                        <!-- TAREAS DIARIAS -->
                         <div class="flex space-x-3">
                              <div class="relative w-full">
                                 <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Tareas Diarias</label>
@@ -501,12 +497,20 @@
                             <input type="hidden" id="selectedDays" value="5">
                         </div>
 
-                        <div class="flex-1 flex flex-col min-h-0">
+                        <!-- TEMAS CON ALTURA COMPACTA (h-12) -->
+                        <div class="flex flex-col min-h-0">
                             <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Temas</label>
-                            <textarea id="topics" class="w-full flex-1 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue focus:ring-2 focus:ring-montessori-blue/20 outline-none transition-all duration-300 text-sm font-medium resize-none" placeholder="Describa los temas a planificar..."></textarea>
+                            <textarea id="topics" class="w-full h-12 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue focus:ring-2 focus:ring-montessori-blue/20 outline-none transition-all duration-300 text-sm font-medium resize-none" placeholder="Describa los temas..."></textarea>
                         </div>
                         
-                        <button type="submit" id="btn-generate" class="group relative w-full bg-montessori-blue hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-montessori-blue/30 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 overflow-hidden mt-2">
+                        <!-- BOTÓN NUEVO: INSTRUCCIONES / RECURSOS -->
+                        <button type="button" id="btn-instructions" onclick="toggleInstructionsModal()" class="w-full py-2.5 px-3 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-gray-600 hover:text-montessori-blue hover:border-montessori-blue hover:bg-blue-50 transition-all duration-300 flex items-center justify-center gap-2 group">
+                            <span class="text-xs font-bold" id="btn-instructions-text">Añadir Instrucciones / Materiales</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        </button>
+                        <input type="hidden" id="customInstructions" value="">
+
+                        <button type="submit" id="btn-generate" class="group relative w-full bg-montessori-blue hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-montessori-blue/30 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 overflow-hidden mt-4">
                             <span class="relative z-10 flex items-center gap-2">GENERAR</span>
                             <div class="absolute inset-0 h-full w-full scale-0 rounded-2xl transition-all duration-300 group-hover:scale-100 group-hover:bg-white/10"></div>
                         </button>
@@ -526,7 +530,7 @@
                     <p class="text-gray-500 text-sm max-w-sm">Completa el formulario y presiona "Generar".</p>
                 </div>
 
-                <!-- Loader NUEVO Y MEJORADO (Overlay) -->
+                <!-- Loader -->
                 <div id="loader" class="hidden absolute inset-0 z-20 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-2xl transition-all duration-300">
                     <div class="flex flex-col items-center">
                         <div class="relative w-20 h-20 mb-6">
@@ -548,7 +552,7 @@
 
                 <!-- Contenedor de Resultados -->
                 <div id="result-content" class="hidden h-full flex-col bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 relative z-10 transition-all duration-500 transform translate-y-4 opacity-0 flex-1">
-                    <!-- BARRA DE HERRAMIENTAS COMPACTA (py-2) Y FIJA (flex-shrink-0, h-14) -->
+                    <!-- BARRA DE HERRAMIENTAS -->
                     <div class="flex justify-between items-center px-4 py-2 bg-gray-50 border-b border-gray-200 flex-shrink-0 h-14">
                         <div class="flex items-center gap-2">
                             <span class="w-2 h-8 bg-montessori-red rounded-full"></span>
@@ -561,7 +565,7 @@
                             <button onclick="copyToClipboard()" class="p-2 text-gray-500 hover:text-montessori-blue hover:bg-blue-50 rounded-lg transition-colors" title="Copiar Texto"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg></button>
                         </div>
                     </div>
-                    <!-- ÁREA DE SCROLL INTERNO: overflow-y-auto AQUÍ -->
+                    <!-- ÁREA DE SCROLL INTERNO -->
                     <div class="flex-1 overflow-y-auto custom-scroll p-8 bg-white" id="markdown-container">
                         <div id="output-text" class="markdown-body text-sm md:text-base"></div>
                     </div>
@@ -569,7 +573,7 @@
             </div>
         </main>
         
-        <!-- Footer Fijo -->
+        <!-- Footer -->
         <footer class="bg-white/90 backdrop-blur-sm border-t border-gray-200 py-4 mt-auto flex-shrink-0 w-full z-10">
             <div class="text-center text-[10px] sm:text-xs text-gray-600">
                 <a href="https://chrisjocoes21.github.io/PORTAFOLIO/" target="_blank" class="animate-pulse-color font-medium transition-colors hover:text-montessori-blue hover:underline" title="Visitar Portafolio">
@@ -584,17 +588,12 @@
 
     <script>
         // CONFIGURACIÓN ARQUITECTURA HÍBRIDA
-        // 1. API_AUTH_URL: Gestiona Usuarios, Roles, Permisos y Cuotas (Backend Nuevo/V5)
         const API_AUTH_URL = "https://script.google.com/macros/s/AKfycbwnNusWP5LlxipynwTszW7bz70GNZa4n3RfEm-8tsM7nFktVeNvXATqz8HddKY_2YK9/exec";
-        
-        // 2. API_GEN_URL: Gestiona exclusivamente la Generación de Texto (Backend Original)
         const API_GEN_URL = "https://script.google.com/macros/s/AKfycbyYTp9lY07wCjxtwMrFZth_78nJm02gUyTK1V72Ngab9VHbChYAzzteBEUy4VzOZCcGWw/exec";
         
         let selectedDays = 5;
         let currentUser = null;
         let dailyQuota = { remaining: 0, total: 0 };
-        let currentUserTimeoutMs = 1.5 * 60 * 1000; // Default: 1.5 min
-        let inactivityTimer;
 
         // --- PARTÍCULAS DEL FONDO ---
         const symbols = ['100', 'A+', 'A', '10', '✓', '95', 'B+', '★', '90', 'A', '100'];
@@ -602,7 +601,6 @@
         function initAllParticles() {
             const containers = document.querySelectorAll('.particles-container');
             containers.forEach(container => {
-                // Limpiar partículas previas si las hay
                 container.innerHTML = '<div class="grid-overlay"></div>';
                 createParticlesForContainer(container);
             });
@@ -635,69 +633,26 @@
             }
         }
         
-        // --- GESTIÓN DE INACTIVIDAD ---
-
-        function resetInactivityTimer() {
-            clearTimeout(inactivityTimer);
-            const appContent = document.getElementById('app-content');
-            const timeoutScreen = document.getElementById('timeout-screen');
-
-            // Solo si la app está visible y la pantalla de timeout no está activa
-            if (!appContent.classList.contains('hidden') && timeoutScreen.classList.contains('hidden')) { 
-                inactivityTimer = setTimeout(() => handleSessionTimeout(), currentUserTimeoutMs);
-            }
-        }
-
-        function handleSessionTimeout() {
-            sessionStorage.removeItem('pinceladas_session');
-            
-            const timeoutScreen = document.getElementById('timeout-screen');
-            const timeoutContent = document.getElementById('timeout-content');
-            
-            timeoutScreen.classList.remove('hidden');
-            requestAnimationFrame(() => {
-                 timeoutContent.classList.remove('scale-95');
-                 timeoutContent.classList.add('scale-100');
-                 timeoutScreen.classList.remove('opacity-0');
-            });
-             document.getElementById('app-content').classList.add('blur-sm'); // Opcional: difuminar el fondo de la app
-        }
-
-
         // --- SISTEMA DE LOGIN Y SESIÓN ---
 
         window.onload = function() {
-            document.body.onmousemove = resetInactivityTimer;
-            document.body.onkeydown = resetInactivityTimer;
-            document.body.onclick = resetInactivityTimer;
-            
             initAllParticles();
             checkSession();
         };
 
         function checkSession() {
+            // sessionStorage se borra automáticamente al cerrar la pestaña.
+            // Si el usuario refresca (F5), la sesión se mantiene.
+            // No hay temporizadores de inactividad.
             const session = sessionStorage.getItem('pinceladas_session');
             const loader = document.getElementById('initial-loader');
 
             if (session) {
                 const data = JSON.parse(session);
-                // Usamos el timeout guardado en la sesión
-                currentUserTimeoutMs = (data.timeout || 1.5) * 60 * 1000;
-                
-                // Si la sesión ha expirado (por si el usuario cerró la pestaña y volvió)
-                if ((new Date().getTime() - data.loginTime) > currentUserTimeoutMs) {
-                    sessionStorage.removeItem('pinceladas_session');
-                    // Mostramos loader inicial y luego Login
-                    setTimeout(() => {
-                        loader.classList.add('opacity-0');
-                        setTimeout(() => loader.classList.add('hidden'), 700);
-                    }, 1000);
-                } else {
-                    // Si la sesión es válida, cargamos la interfaz
-                    loginUserSuccess(data.name, data.usernameUnique, true);
-                }
+                // Sesión válida, cargar interfaz directamente
+                loginUserSuccess(data.name, data.usernameUnique, true);
             } else {
-                // No hay sesión, mostramos Login
+                // No hay sesión, mostrar Login
                 setTimeout(() => {
                     loader.classList.add('opacity-0');
                     setTimeout(() => loader.classList.add('hidden'), 700);
@@ -715,8 +670,7 @@
             const statusBox = document.getElementById('login-status-container');
             const statusText = document.getElementById('login-status-text');
 
-            // 1. UI Loading (ESTABLE)
-            btnText.classList.add('hidden-text'); // Oculta el texto sin cambiar el tamaño del botón
+            btnText.classList.add('hidden-text'); 
             loader.classList.remove('hidden');
             btn.disabled = true;
             statusBox.className = "min-h-[40px] transition-all duration-300 rounded-lg flex items-center justify-center gap-2 border px-2 py-1 bg-blue-50 border-blue-200";
@@ -724,30 +678,25 @@
             statusText.innerText = "Verificando credenciales...";
 
             try {
-                // 2. Login Normal (USANDO API_AUTH_URL)
                 const response = await fetch(`${API_AUTH_URL}?action=login&username=${encodeURIComponent(user)}&password=${encodeURIComponent(pass)}`);
                 const data = await response.json();
 
                 if (data.success) {
                     statusText.innerText = "Verificando privilegios de acceso...";
-                    // 3. Verificar Cuota y Permiso IA (USANDO API_AUTH_URL)
                     const quotaResponse = await fetch(`${API_AUTH_URL}?action=checkPlannerQuota&username=${encodeURIComponent(data.usernameUnique)}`);
                     const quotaData = await quotaResponse.json();
 
                     if (quotaData.success) {
                         if (quotaData.restricted) {
-                            // USUARIO RESTRINGIDO (Acceso_IA = NO)
                             showAccessDeniedModal();
                             btnText.classList.remove('hidden-text');
                             loader.classList.add('hidden');
                             btn.disabled = false;
                         } else {
-                            // USUARIO AUTORIZADO
-                            currentUserTimeoutMs = (data.timeout || 1.5) * 60 * 1000;
                             const sessionData = {
                                 name: data.name,
                                 usernameUnique: data.usernameUnique,
-                                timeout: data.timeout, // Guardamos el timeout
+                                // No guardamos timeout porque ya no se usa
                                 loginTime: new Date().getTime()
                             };
                             sessionStorage.setItem('pinceladas_session', JSON.stringify(sessionData));
@@ -770,7 +719,6 @@
                 statusText.className = "text-xs font-bold text-red-600";
                 statusText.innerText = error.message.includes("Credenciales") ? "Usuario o contraseña incorrectos" : "Error de conexión";
                 
-                // Restaura el botón
                 btnText.classList.remove('hidden-text');
                 loader.classList.add('hidden');
                 btn.disabled = false;
@@ -788,10 +736,8 @@
 
         function loginUserSuccess(name, usernameUnique, isAutoLogin) {
             currentUser = usernameUnique;
-            // CAMBIO: Mostrar nombre completo sin recortar
             document.getElementById('user-name-display').innerText = name; 
             
-            // Ocultar login y loader
             const loginScreen = document.getElementById('login-screen');
             const loader = document.getElementById('initial-loader');
             const appContent = document.getElementById('app-content');
@@ -805,14 +751,12 @@
                 refreshQuota(usernameUnique);
             }
 
-            // Mostrar App
             appContent.classList.remove('hidden');
             setTimeout(() => {
                 appContent.classList.remove('opacity-0');
                 updateQuotaDisplay();
-                resetInactivityTimer(); // Inicia el temporizador de inactividad
-                initDropdowns(); // Inicializar dropdowns
-                setHomework(true); // Default a SÍ
+                initDropdowns(); 
+                setHomework(true);
             }, 100);
         }
 
@@ -823,7 +767,6 @@
 
         async function refreshQuota(username) {
             try {
-                // Consultar cuota al backend de Auth
                 const response = await fetch(`${API_AUTH_URL}?action=checkPlannerQuota&username=${encodeURIComponent(username)}`);
                 const data = await response.json();
                 if(data.success && !data.restricted) {
@@ -840,7 +783,6 @@
             const counter = document.getElementById('usage-counter');
             if(dailyQuota.total > 0) {
                 counter.innerText = `${dailyQuota.remaining} / ${dailyQuota.total}`;
-                // Color alert si queda poco
                 if(dailyQuota.remaining === 0) counter.className = "text-[10px] font-black text-red-600";
                 else counter.className = "text-[10px] font-black text-montessori-blue";
             } else {
@@ -867,70 +809,69 @@
             }
         }
 
-        // --- UI CONTROL FOR CUSTOM SELECT ---
-        function initDropdowns() {
-            // Ya no necesitamos renderizar opciones dinámicamente si están hardcodeadas en HTML,
-            // pero si las renderizamos, asegurémonos de que existen los contenedores.
-            // En esta versión, el HTML ya tiene los botones, así que solo necesitamos la lógica de toggle.
+        // --- MODAL DE INSTRUCCIONES ---
+        function toggleInstructionsModal() {
+            const modal = document.getElementById('instructions-modal');
+            modal.classList.toggle('hidden');
         }
 
-        // Esta función maneja la lógica de los dropdowns personalizados en el HTML
+        function saveInstructions() {
+            const input = document.getElementById('instructions-input');
+            const hiddenField = document.getElementById('customInstructions');
+            const btn = document.getElementById('btn-instructions');
+            const btnText = document.getElementById('btn-instructions-text');
+            
+            hiddenField.value = input.value.trim();
+            toggleInstructionsModal();
+
+            // CAMBIO DE ESTADO DEL BOTÓN: A ROJO SI HAY CONTENIDO
+            if (hiddenField.value.length > 0) {
+                btn.className = "w-full py-2.5 px-3 rounded-lg bg-montessori-red text-white border border-transparent shadow-md hover:bg-red-700 transition-all duration-300 flex items-center justify-center gap-2 group";
+                btnText.textContent = "Instrucciones Guardadas";
+            } else {
+                // Estado original (Gris/Neutro)
+                btn.className = "w-full py-2.5 px-3 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-gray-600 hover:text-montessori-blue hover:border-montessori-blue hover:bg-blue-50 transition-all duration-300 flex items-center justify-center gap-2 group";
+                btnText.textContent = "Añadir Instrucciones / Materiales";
+            }
+        }
+
+        // --- UI CONTROL FOR CUSTOM SELECT ---
+        function initDropdowns() {}
+
         function toggleDropdown(type) {
-            const list = type === 'style' ? document.getElementById('style-dropdown-list') : document.getElementById('extension-dropdown-list');
-            const chevron = type === 'style' ? document.getElementById('style-chevron') : document.getElementById('extension-chevron');
-            // Check visibility using the class that controls it
+            const list = type === 'style' ? document.getElementById('style-dropdown-list') : null;
+            const chevron = type === 'style' ? document.getElementById('style-chevron') : null;
             const isClosed = list.classList.contains('hidden');
 
-            // Cerrar todos los demás menús
-            ['style', 'extension'].forEach(t => {
-                const otherList = t === 'style' ? document.getElementById('style-dropdown-list') : document.getElementById('extension-dropdown-list');
-                const otherChevron = t === 'style' ? document.getElementById('style-chevron') : document.getElementById('extension-chevron');
-                
-                // Siempre cerrar los otros
-                if (otherList) otherList.classList.add('hidden');
-                if (otherChevron) otherChevron.classList.remove('rotate-180');
-            });
-
-            // Si estaba cerrado, lo abrimos. Si estaba abierto, ya se cerró en el bucle anterior (porque está incluido en el foreach)
-            // PERO el bucle cierra 'type' también. Así que si estaba cerrado (isClosed=true), ahora debemos abrirlo.
             if (isClosed && list) {
                 list.classList.remove('hidden');
                 chevron.classList.add('rotate-180');
+            } else if (list) {
+                list.classList.add('hidden');
+                chevron.classList.remove('rotate-180');
             }
         }
 
         function selectDropdownValue(type, value) {
-            const input = type === 'style' ? document.getElementById('teachingStyle') : document.getElementById('planExtension');
-            const textDisplay = type === 'style' ? document.getElementById('selected-style-text') : document.getElementById('selected-extension-text');
+            const input = document.getElementById('teachingStyle');
+            const textDisplay = document.getElementById('selected-style-text');
             
             input.value = value;
             textDisplay.textContent = value;
             
-            // Cerrar menú explícitamente
-            const list = type === 'style' ? document.getElementById('style-dropdown-list') : document.getElementById('extension-dropdown-list');
-            const chevron = type === 'style' ? document.getElementById('style-chevron') : document.getElementById('extension-chevron');
+            const list = document.getElementById('style-dropdown-list');
+            const chevron = document.getElementById('style-chevron');
             if (list) list.classList.add('hidden');
             if (chevron) chevron.classList.remove('rotate-180');
         }
 
-        // Close dropdowns on outside click
         document.addEventListener('click', function(e) {
             const styleBtn = document.getElementById('style-dropdown-btn');
             const styleList = document.getElementById('style-dropdown-list');
-            // Si el click no fue en la lista ni en el botón, cerrar
             if (styleList && !styleList.classList.contains('hidden') && !styleList.contains(e.target) && !styleBtn.contains(e.target)) {
                 styleList.classList.add('hidden');
                 document.getElementById('style-chevron').classList.remove('rotate-180');
             }
-
-            // Eliminado el check de extension ya que fue removido del HTML, pero lo dejamos como comentario para referencia
-            /* const extBtn = document.getElementById('extension-dropdown-btn');
-            const extList = document.getElementById('extension-dropdown-list');
-            if (extList && !extList.classList.contains('hidden') && !extList.contains(e.target) && !extBtn.contains(e.target)) {
-                extList.classList.add('hidden');
-                document.getElementById('extension-chevron').classList.remove('rotate-180');
-            }
-            */
         });
 
         // --- HOMEWORK TOGGLE ---
@@ -939,7 +880,6 @@
             const yesBtn = document.getElementById('hw-yes');
             const noBtn = document.getElementById('hw-no');
             
-            // Reset classes
             yesBtn.className = "flex-1 py-1 text-[10px] font-bold rounded transition-all";
             noBtn.className = "flex-1 py-1 text-[10px] font-bold rounded transition-all";
 
@@ -954,48 +894,54 @@
 
         async function generatePlan(e) {
             e.preventDefault();
-            resetInactivityTimer(); // Resetea el timer en cada interacción importante
-
-            // 1. Verificar Cuota Local antes de llamar
+            
             if (dailyQuota.remaining <= 0) {
                 showToast("Has alcanzado tu límite diario de planificaciones.");
                 return;
             }
 
-            // 2. Recoger datos
             const subject = document.getElementById('subject').value;
             const groupDetails = document.getElementById('groupDetails').value;
             const style = document.getElementById('teachingStyle').value || "Tradicional";
             const topics = document.getElementById('topics').value;
             const daysCount = document.getElementById('selectedDays').value;
-            // Se elimina la variable extension
             const hasHomework = document.getElementById('homeworkEnabled').value === 'true';
+            const extraInstructions = document.getElementById('customInstructions').value;
 
             // Lógica Adecuación
             let styleInstructions = "";
-            
             if (style === "Adecuación Curricular") {
                 styleInstructions = `ESTILO: ADECUACIÓN CURRICULAR. Simplifica temas, desglose en pasos pequeños, enfoque visual/manipulativo. Evita teoría densa.`;
             } else if (style === "Líder en Mí") {
-                styleInstructions = `ESTILO: LÍDER EN MÍ. Integra los 7 hábitos de Covey (Proactividad, Fin en mente, Priorizar, Ganar-Ganar, Entender, Sinergizar, Afilar sierra). Usa lenguaje de liderazgo.`;
+                styleInstructions = `ESTILO: LÍDER EN MÍ. Integra los 7 hábitos de Covey.`;
             } else if (style === "Montessori") {
-                styleInstructions = `ESTILO: MONTESSORI. Enfoque en ambiente preparado, autonomía, materiales concretos y rol de guía.`;
+                styleInstructions = `ESTILO: MONTESSORI. Enfoque en ambiente preparado, autonomía, materiales concretos.`;
             } else if (style === "Gamificación") {
-                styleInstructions = `ESTILO: GAMIFICACIÓN. Usa dinámicas de juego, retos, recompensas y narrativa lúdica.`;
+                styleInstructions = `ESTILO: GAMIFICACIÓN. Usa dinámicas de juego, retos y narrativa lúdica.`;
             }
             
-            // Se establece la concisión EQUILIBRADA para ahorrar cuota sin perder utilidad
-            const promptConciseness = "Sé directo y funcional. Describe las actividades claramente pero evita explicaciones teóricas largas. Prioriza la acción y la brevedad para asegurar que se generen los 5 días completos.";
+            const promptConciseness = "Sé directo y funcional. Describe actividades claramente pero evita explicaciones teóricas largas. Prioriza la acción.";
             
-            // Lógica Tareas Diarias (Flexible)
             const taskInstruction = hasHomework 
-                ? "* **Tarea:** [Si aplica, añade una tarea breve. No es obligatorio todos los días, solo cuando aporte valor.]" 
+                ? "* **Tarea:** [Tarea breve opcional]" 
                 : "NO incluyas sección de Tarea.";
+
+            // INYECCIÓN CUIDADOSA DE INSTRUCCIONES EXTRA
+            let instructionsBlock = "";
+            if (extraInstructions && extraInstructions.trim() !== "") {
+                instructionsBlock = `
+                IMPORTANTE - REQUISITOS ADICIONALES DEL USUARIO:
+                "${extraInstructions}"
+                
+                DIRECTIVA ESTRICTA: Integra estos materiales, recursos o adaptaciones en las actividades PERO NO CAMBIES LA EXTENSIÓN NI EL FORMATO DE LA CLASE. No escribas párrafos introductorios sobre estas instrucciones, simplemente úsalas dentro de la planificación.`;
+            }
 
             const systemInstruction = `Eres un planificador docente experto.
             Genera ${daysCount} clases.
             ${styleInstructions}
             ${promptConciseness}
+            
+            ${instructionsBlock}
             
             FORMATO OBLIGATORIO POR DÍA:
             ### Clase N: [Tema]
@@ -1005,26 +951,21 @@
             ${taskInstruction}
             
             NO escribas introducciones ni conclusiones generales.
-            USA SIEMPRE VIÑETAS (LISTAS CON PUNTOS) PARA ORGANIZAR LA INFORMACIÓN.`;
+            USA SIEMPRE VIÑETAS.`;
             
             const userPrompt = `Asignatura: ${subject}. Grupo: ${groupDetails}. Temas: ${topics}. Generar ${daysCount} días.`;
 
-            // 3. UI Loading
             document.getElementById('loader').classList.remove('hidden');
             document.getElementById('result-placeholder').classList.add('hidden');
             
-            // Ocultar resultados previos si existen, para limpiar la vista
             const resultContainer = document.getElementById('result-content');
             resultContainer.classList.add('hidden');
-            resultContainer.classList.remove('flex'); // Remover flex temporalmente
+            resultContainer.classList.remove('flex');
             
             const btnGenerate = document.getElementById('btn-generate');
             btnGenerate.disabled = true;
 
             try {
-                console.log("Procesando solicitud...");
-                
-                // --- PASO 1: LLAMADA A LA IA (API_GEN_URL) ---
                 const response = await fetch(API_GEN_URL, {
                     method: 'POST',
                     redirect: 'follow',
@@ -1045,7 +986,6 @@
 
                 const aiText = data.text;
 
-                // --- PASO 2: REGISTRAR USO (API_AUTH_URL) ---
                 fetch(API_AUTH_URL, {
                     method: 'POST',
                     redirect: 'follow',
@@ -1060,17 +1000,13 @@
                      }
                 });
 
-                // 5. Renderizar
                 document.getElementById('plan-meta').textContent = `${subject} • ${groupDetails} • ${daysCount} Clases`;
-                
-                // --- NUEVA LÓGICA: SE ELIMINÓ EL RESUMEN ---
                 document.getElementById('output-text').innerHTML = marked.parse(aiText);
                 
                 document.getElementById('loader').classList.add('hidden');
                 
-                // Mostrar resultado con efecto
                 resultContainer.classList.remove('hidden');
-                resultContainer.classList.add('flex'); // Restaurar flex
+                resultContainer.classList.add('flex');
                 requestAnimationFrame(() => resultContainer.classList.remove('translate-y-4', 'opacity-0'));
 
             } catch (error) {
@@ -1095,20 +1031,6 @@
                 showToast("No se pudo copiar.");
             }
             window.getSelection().removeAllRanges();
-        }
-
-        function printPlan() {
-            const content = document.getElementById('markdown-container').innerHTML;
-            const win = window.open('', '', 'height=700,width=900');
-            win.document.write(`<html><head><title>Planificación</title><style>
-                body{font-family:'Inter', sans-serif;padding:40px; color:#374151;}
-                h3 { color: #C00000 !important; font-weight: 900; border-bottom: 1px solid #ddd; text-transform: uppercase; }
-                strong { color: #002060; }
-                ul { margin-bottom: 1em; }
-                @media print { @page { margin: 1in; } }
-            </style></head><body>${content}</body></html>`);
-            win.document.close();
-            win.print();
         }
     </script>
 </body>
