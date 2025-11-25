@@ -295,8 +295,6 @@
         </div>
     </div>
     
-    <!-- (ELIMINADO: Timeout Screen) -->
-
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-blue-50 overflow-hidden transition-all duration-700">
         <div class="animated-diagonal-background animate-diagonal-shift"></div>
@@ -372,20 +370,51 @@
         </div>
     </div>
     
-    <!-- NUEVO MODAL: INSTRUCCIONES / COMENTARIOS (SIN ANIMACIÓN) -->
+    <!-- MODAL INSTRUCCIONES MEJORADO (CON GALERÍA DE IMÁGENES) -->
     <div id="instructions-modal" class="hidden fixed inset-0 z-[250] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full mx-4 border border-gray-100 flex flex-col h-[70vh] md:h-auto">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full mx-4 border border-gray-100 flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
-                <h3 class="text-lg font-bold text-montessori-blue font-montserrat">Instrucciones Especiales</h3>
+                <h3 class="text-lg font-bold text-montessori-blue font-montserrat">Recursos & Instrucciones</h3>
                 <button onclick="toggleInstructionsModal()" class="text-gray-400 hover:text-montessori-red transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div class="flex-1 flex flex-col gap-2">
-                <p class="text-xs text-gray-500 mb-2">Especifique materiales obligatorios, recursos concretos o adaptaciones que desee integrar. <span class="text-montessori-red font-bold">Estos requisitos se integrarán al plan.</span></p>
-                <textarea id="instructions-input" class="w-full flex-1 p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:border-montessori-blue focus:ring-2 focus:ring-blue-100 outline-none resize-none" placeholder="Ej: Usar material visual para matemáticas, incluir video sobre el ciclo del agua..."></textarea>
+            
+            <div class="flex-1 flex flex-col gap-4 overflow-y-auto custom-scroll pr-1">
+                <!-- Sección Texto -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Instrucciones / Adaptaciones</label>
+                    <textarea id="instructions-input" class="w-full h-24 p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:border-montessori-blue focus:ring-2 focus:ring-blue-100 outline-none resize-none" placeholder="Ej: Enfocarse en ejercicios prácticos, usar materiales concretos..."></textarea>
+                </div>
+
+                <!-- Sección Imagen -->
+                <div>
+                    <div class="flex justify-between items-end mb-2">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Fotos del Libro / Actividad (Máx. 6)</label>
+                        <span id="img-count" class="text-[10px] text-gray-400 font-medium">0/6</span>
+                    </div>
+                    
+                    <!-- Input oculto para múltiples archivos -->
+                    <input type="file" id="image-upload" accept="image/*" multiple class="hidden" onchange="handleImageUpload(event)">
+                    
+                    <!-- Zona de previsualización / Carga -->
+                    <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer" onclick="document.getElementById('image-upload').click()">
+                        <div class="text-gray-400 flex flex-col items-center gap-2">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span class="text-xs font-medium">Toca para adjuntar fotos</span>
+                        </div>
+                    </div>
+
+                    <!-- Grid de Previsualización (Galería) -->
+                    <div id="images-grid" class="hidden grid grid-cols-3 gap-2 mt-3">
+                        <!-- Las imágenes se insertarán aquí dinámicamente -->
+                    </div>
+                    
+                    <p class="text-[10px] text-gray-400 mt-2 text-center">* Las imágenes se comprimirán automáticamente para optimizar el envío.</p>
+                </div>
             </div>
-            <div class="mt-4 flex justify-end gap-3">
+
+            <div class="mt-4 flex justify-end gap-3 pt-2 border-t border-gray-100">
                 <button onclick="toggleInstructionsModal()" class="px-4 py-2 text-sm text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancelar</button>
                 <button onclick="saveInstructions()" class="px-6 py-2 bg-montessori-blue text-white text-sm font-bold rounded-lg hover:bg-blue-800 transition-colors shadow-lg shadow-blue-900/20">Guardar Cambios</button>
             </div>
@@ -503,12 +532,13 @@
                             <textarea id="topics" class="w-full h-12 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue focus:ring-2 focus:ring-montessori-blue/20 outline-none transition-all duration-300 text-sm font-medium resize-none" placeholder="Describa los temas..."></textarea>
                         </div>
                         
-                        <!-- BOTÓN NUEVO: INSTRUCCIONES / RECURSOS -->
+                        <!-- BOTÓN NUEVO: INSTRUCCIONES / RECURSOS / IMAGEN -->
                         <button type="button" id="btn-instructions" onclick="toggleInstructionsModal()" class="w-full py-2.5 px-3 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-gray-600 hover:text-montessori-blue hover:border-montessori-blue hover:bg-blue-50 transition-all duration-300 flex items-center justify-center gap-2 group">
-                            <span class="text-xs font-bold" id="btn-instructions-text">Añadir Instrucciones / Materiales</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            <span class="text-xs font-bold truncate" id="btn-instructions-text">Añadir Instrucciones / Fotos</span>
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
                         </button>
                         <input type="hidden" id="customInstructions" value="">
+                        <!-- Variable global en JS manejará la imagen -->
 
                         <button type="submit" id="btn-generate" class="group relative w-full bg-montessori-blue hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-montessori-blue/30 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 overflow-hidden mt-4">
                             <span class="relative z-10 flex items-center gap-2">GENERAR</span>
@@ -527,7 +557,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-montessori-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                     </div>
                     <h3 class="text-xl font-bold text-gray-700 font-montserrat mb-2">Listo para Planificar</h3>
-                    <p class="text-gray-500 text-sm max-w-sm">Completa el formulario y presiona "Generar".</p>
+                    <p class="text-gray-500 text-sm max-w-sm">Completa el formulario y presiona "Generar". Puedes adjuntar fotos de libros para incluirlas.</p>
                 </div>
 
                 <!-- Loader -->
@@ -545,7 +575,7 @@
                                 <span class="h-1.5 w-1.5 bg-montessori-red rounded-full animate-bounce" style="animation-delay: 150ms"></span>
                                 <span class="h-1.5 w-1.5 bg-montessori-red rounded-full animate-bounce" style="animation-delay: 300ms"></span>
                             </div>
-                            <p class="text-xs text-gray-500 font-medium">Analizando requisitos...</p>
+                            <p class="text-xs text-gray-500 font-medium">Analizando requisitos e imágenes...</p>
                         </div>
                     </div>
                 </div>
@@ -594,6 +624,11 @@
         let selectedDays = 5;
         let currentUser = null;
         let dailyQuota = { remaining: 0, total: 0 };
+        
+        // --- GESTIÓN DE MÚLTIPLES IMÁGENES ---
+        // Array para almacenar las imágenes en Base64
+        let attachedImages = [];
+        const MAX_IMAGES = 6; // ACTUALIZADO A 6
 
         // --- PARTÍCULAS DEL FONDO ---
         const symbols = ['100', 'A+', 'A', '10', '✓', '95', 'B+', '★', '90', 'A', '100'];
@@ -642,8 +677,6 @@
 
         function checkSession() {
             // sessionStorage se borra automáticamente al cerrar la pestaña.
-            // Si el usuario refresca (F5), la sesión se mantiene.
-            // No hay temporizadores de inactividad.
             const session = sessionStorage.getItem('pinceladas_session');
             const loader = document.getElementById('initial-loader');
 
@@ -696,7 +729,6 @@
                             const sessionData = {
                                 name: data.name,
                                 usernameUnique: data.usernameUnique,
-                                // No guardamos timeout porque ya no se usa
                                 loginTime: new Date().getTime()
                             };
                             sessionStorage.setItem('pinceladas_session', JSON.stringify(sessionData));
@@ -809,6 +841,119 @@
             }
         }
 
+        // --- MANEJO DE MÚLTIPLES IMÁGENES ---
+        async function handleImageUpload(event) {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+
+            // Verificar límite
+            if (attachedImages.length + files.length > MAX_IMAGES) {
+                showToast(`Máximo ${MAX_IMAGES} imágenes permitidas.`);
+                event.target.value = ""; // Limpiar selección para reintentar
+                return;
+            }
+
+            // Mostrar estado de carga temporal
+            const uploadArea = document.getElementById('upload-area');
+            const originalText = uploadArea.innerHTML;
+            uploadArea.innerHTML = '<span class="text-xs text-blue-500 font-bold animate-pulse">Procesando...</span>';
+
+            try {
+                // Procesar todas las imágenes en paralelo
+                const compressedPromises = files.map(file => compressImage(file, 800, 0.7));
+                const newImages = await Promise.all(compressedPromises);
+
+                // Añadir a la lista global
+                attachedImages = [...attachedImages, ...newImages];
+                
+                renderImagePreviews();
+                
+            } catch (err) {
+                showToast("Error al procesar alguna imagen.");
+                console.error(err);
+            } finally {
+                uploadArea.innerHTML = originalText;
+                document.getElementById('image-upload').value = ""; // Reset input para permitir seleccionar más
+            }
+        }
+
+        function renderImagePreviews() {
+            const grid = document.getElementById('images-grid');
+            const uploadArea = document.getElementById('upload-area');
+            const counter = document.getElementById('img-count');
+
+            grid.innerHTML = ''; // Limpiar grid
+
+            if (attachedImages.length > 0) {
+                grid.classList.remove('hidden');
+                
+                // Si llegamos al máximo, ocultamos el área de subida para no saturar UI
+                if (attachedImages.length >= MAX_IMAGES) {
+                    uploadArea.classList.add('hidden');
+                } else {
+                    uploadArea.classList.remove('hidden');
+                }
+
+                attachedImages.forEach((base64, index) => {
+                    const div = document.createElement('div');
+                    div.className = "relative group rounded-lg overflow-hidden border border-gray-200 aspect-square";
+                    
+                    div.innerHTML = `
+                        <img src="${base64}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="removeImage(${index})" class="bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 shadow-sm transition-transform hover:scale-110">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                });
+            } else {
+                grid.classList.add('hidden');
+                uploadArea.classList.remove('hidden');
+            }
+
+            counter.innerText = `${attachedImages.length}/${MAX_IMAGES}`;
+        }
+
+        function removeImage(index) {
+            // Eliminar del array
+            attachedImages.splice(index, 1);
+            renderImagePreviews();
+        }
+
+        // Función auxiliar para comprimir imagen usando Canvas
+        function compressImage(file, maxWidth, quality) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = event => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Retornar base64 comprimido (JPEG)
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.onerror = error => reject(error);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
         // --- MODAL DE INSTRUCCIONES ---
         function toggleInstructionsModal() {
             const modal = document.getElementById('instructions-modal');
@@ -822,16 +967,23 @@
             const btnText = document.getElementById('btn-instructions-text');
             
             hiddenField.value = input.value.trim();
+            
             toggleInstructionsModal();
 
-            // CAMBIO DE ESTADO DEL BOTÓN: A ROJO SI HAY CONTENIDO
-            if (hiddenField.value.length > 0) {
+            // CAMBIO DE ESTADO DEL BOTÓN
+            const hasText = hiddenField.value.length > 0;
+            const imgCount = attachedImages.length;
+
+            if (hasText || imgCount > 0) {
                 btn.className = "w-full py-2.5 px-3 rounded-lg bg-montessori-red text-white border border-transparent shadow-md hover:bg-red-700 transition-all duration-300 flex items-center justify-center gap-2 group";
-                btnText.textContent = "Instrucciones Guardadas";
+                
+                if (hasText && imgCount > 0) btnText.textContent = `Instrucciones + ${imgCount} Fotos`;
+                else if (imgCount > 0) btnText.textContent = `${imgCount} Fotos Adjuntadas`;
+                else btnText.textContent = "Instrucciones Guardadas";
             } else {
-                // Estado original (Gris/Neutro)
+                // Estado original
                 btn.className = "w-full py-2.5 px-3 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-gray-600 hover:text-montessori-blue hover:border-montessori-blue hover:bg-blue-50 transition-all duration-300 flex items-center justify-center gap-2 group";
-                btnText.textContent = "Añadir Instrucciones / Materiales";
+                btnText.textContent = "Añadir Instrucciones / Fotos";
             }
         }
 
@@ -933,7 +1085,13 @@
                 IMPORTANTE - REQUISITOS ADICIONALES DEL USUARIO:
                 "${extraInstructions}"
                 
-                DIRECTIVA ESTRICTA: Integra estos materiales, recursos o adaptaciones en las actividades PERO NO CAMBIES LA EXTENSIÓN NI EL FORMATO DE LA CLASE. No escribas párrafos introductorios sobre estas instrucciones, simplemente úsalas dentro de la planificación.`;
+                DIRECTIVA ESTRICTA: Integra estos materiales, recursos o adaptaciones en las actividades PERO NO CAMBIES LA EXTENSIÓN NI EL FORMATO DE LA CLASE.`;
+            }
+
+            // AVISO SI HAY IMÁGENES
+            if (attachedImages.length > 0) {
+                instructionsBlock += `
+                [NOTA: El usuario ha adjuntado ${attachedImages.length} imagen(es) de libros o actividades. ANALIZA LAS IMÁGENES y usa su contenido para crear las actividades solicitadas, adaptándolas si es necesario.]`;
             }
 
             const systemInstruction = `Eres un planificador docente experto.
@@ -966,14 +1124,22 @@
             btnGenerate.disabled = true;
 
             try {
+                // PREPARAR PAYLOAD CON IMÁGENES (ARRAY)
+                const payload = {
+                    prompt: userPrompt,
+                    systemInstruction: systemInstruction
+                };
+
+                // Si hay imágenes, enviarlas como array
+                if (attachedImages.length > 0) {
+                    payload.images = attachedImages;
+                }
+
                 const response = await fetch(API_GEN_URL, {
                     method: 'POST',
                     redirect: 'follow',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({
-                        prompt: userPrompt,
-                        systemInstruction: systemInstruction
-                    })
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
