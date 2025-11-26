@@ -16,9 +16,17 @@
     <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Chewy&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     
+    <!-- LIBRERÍAS PARA WORD (Frontend) -->
+    <script src="https://unpkg.com/pizzip@3.1.4/dist/pizzip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.49.1/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <!-- JSON5 para parsing robusto -->
+    <script src="https://unpkg.com/json5@2/dist/index.min.js"></script>
+    
     <!-- Markdown Parser -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -159,21 +167,63 @@
         .logo-lg .text-pinceladas { font-size: clamp(2.5rem, 6vw, 3.2rem); }
         .logo-lg .text-montessori-sub { font-size: clamp(1rem, 2.5vw, 1.2rem); }
 
-        /* Markdown Styles */
-        .markdown-body h1 { font-size: 1.5em; font-weight: bold; color: #002060; margin-top: 1em; margin-bottom: 0.5em; font-family: 'Montserrat', sans-serif; }
-        .markdown-body h2 { font-size: 1.25em; font-weight: bold; color: #C00000; margin-top: 1em; margin-bottom: 0.5em; font-family: 'Montserrat', sans-serif; border-bottom: 1px solid #eee; padding-bottom: 0.2em; }
-        .markdown-body h3 { font-size: 1.2em; font-weight: 900; color: #C00000; margin-top: 1.2em; margin-bottom: 0.5em; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-        .markdown-body ul { list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em; }
-        .markdown-body li { margin-bottom: 0.3em; }
-        .markdown-body p { margin-bottom: 0.8em; line-height: 1.5; }
-        .markdown-body strong { color: #002060; font-weight: 700; }
+        /* Estilos del Editor Manual (Resultados) */
+        .plan-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+        }
+        .plan-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
         
-        /* Loading Dots */
-        .loading-dots:after { content: '.'; animation: dots 1.5s steps(5, end) infinite; }
-        @keyframes dots { 0%, 20% { content: '.'; } 40% { content: '..'; } 60% { content: '...'; } 80%, 100% { content: ''; } }
+        .day-header {
+            color: #C00000;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 1rem;
+            border-bottom: 2px solid #fee2e2;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .section-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.05em;
+        }
 
-        /* Botón de días activo */
-        .day-btn.active { background-color: #002060; color: white; border-color: #002060; }
+        .editable-field {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #334155;
+            background-color: #f8fafc;
+            transition: all 0.2s;
+            resize: none;
+            outline: none;
+        }
+        
+        .editable-field:focus {
+            background-color: #ffffff;
+            border-color: #002060;
+            box-shadow: 0 0 0 3px rgba(0, 32, 96, 0.1);
+        }
+        
+        .field-topic { height: 3rem; font-weight: 600; }
+        .field-activities { height: 8rem; }
 
         /* Toast Notification */
         #toast {
@@ -282,6 +332,14 @@
             color: #002060; 
         }
 
+        /* ESTILO PARA BOTONES DE DÍA CORREGIDO */
+        .day-btn.active {
+            background-color: #002060; 
+            color: white; 
+            border-color: #002060;
+            box-shadow: 0 2px 5px rgba(0, 32, 96, 0.2);
+        }
+
     </style>
 </head>
 <body class="text-slate-800 font-sans antialiased">
@@ -370,51 +428,50 @@
         </div>
     </div>
     
-    <!-- MODAL INSTRUCCIONES MEJORADO (CON GALERÍA DE IMÁGENES) -->
+    <!-- MODAL INSTRUCCIONES MEJORADO (AMPLIADO Y SIN SALTOS) -->
     <div id="instructions-modal" class="hidden fixed inset-0 z-[250] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-lg w-full mx-4 border border-gray-100 flex flex-col max-h-[90vh]">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100">
-                <h3 class="text-lg font-bold text-montessori-blue font-montserrat">Recursos & Instrucciones</h3>
+        <!-- CLASE CAMBIADA: max-w-4xl para más anchura, h-[80vh] para altura fija -->
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-4xl w-full mx-4 border border-gray-100 flex flex-col h-[85vh] transition-all transform duration-300">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100 flex-shrink-0">
+                <h3 class="text-lg font-bold text-montessori-blue font-montserrat flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    Recursos & Instrucciones
+                </h3>
                 <button onclick="toggleInstructionsModal()" class="text-gray-400 hover:text-montessori-red transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
             
-            <div class="flex-1 flex flex-col gap-4 overflow-y-auto custom-scroll pr-1">
-                <!-- Sección Texto -->
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Instrucciones / Adaptaciones</label>
-                    <textarea id="instructions-input" class="w-full h-24 p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:border-montessori-blue focus:ring-2 focus:ring-blue-100 outline-none resize-none" placeholder="Ej: Enfocarse en ejercicios prácticos, usar materiales concretos..."></textarea>
+            <div class="flex-1 flex flex-col md:flex-row gap-6 overflow-hidden">
+                <!-- Columna Izquierda: Instrucciones -->
+                <div class="flex-1 flex flex-col overflow-hidden">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Instrucciones Adicionales / Adaptaciones</label>
+                    <textarea id="instructions-input" class="w-full flex-1 p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:border-montessori-blue focus:ring-2 focus:ring-blue-100 outline-none resize-none transition-all" placeholder="Ej: Enfocarse en ejercicios prácticos, usar materiales concretos, adaptar para alumno con TDAH..."></textarea>
                 </div>
 
-                <!-- Sección Imagen -->
-                <div>
-                    <div class="flex justify-between items-end mb-2">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Fotos del Libro / Actividad (Máx. 6)</label>
+                <!-- Columna Derecha: Imágenes -->
+                <div class="flex-1 flex flex-col overflow-hidden border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6">
+                    <div class="flex justify-between items-end mb-2 flex-shrink-0">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Fotos del Libro / Actividad</label>
                         <span id="img-count" class="text-[10px] text-gray-400 font-medium">0/6</span>
                     </div>
                     
-                    <!-- Input oculto para múltiples archivos -->
                     <input type="file" id="image-upload" accept="image/*" multiple class="hidden" onchange="handleImageUpload(event)">
                     
-                    <!-- Zona de previsualización / Carga -->
-                    <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer" onclick="document.getElementById('image-upload').click()">
+                    <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer flex-shrink-0" onclick="document.getElementById('image-upload').click()">
                         <div class="text-gray-400 flex flex-col items-center gap-2">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                             <span class="text-xs font-medium">Toca para adjuntar fotos</span>
                         </div>
                     </div>
 
-                    <!-- Grid de Previsualización (Galería) -->
-                    <div id="images-grid" class="hidden grid grid-cols-3 gap-2 mt-3">
-                        <!-- Las imágenes se insertarán aquí dinámicamente -->
+                    <div id="images-grid" class="hidden grid grid-cols-2 lg:grid-cols-3 gap-2 mt-3 overflow-y-auto custom-scroll pr-1">
+                        <!-- Imágenes -->
                     </div>
-                    
-                    <p class="text-[10px] text-gray-400 mt-2 text-center">* Las imágenes se comprimirán automáticamente para optimizar el envío.</p>
                 </div>
             </div>
 
-            <div class="mt-4 flex justify-end gap-3 pt-2 border-t border-gray-100">
+            <div class="mt-4 flex justify-end gap-3 pt-3 border-t border-gray-100 flex-shrink-0">
                 <button onclick="toggleInstructionsModal()" class="px-4 py-2 text-sm text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancelar</button>
                 <button onclick="saveInstructions()" class="px-6 py-2 bg-montessori-blue text-white text-sm font-bold rounded-lg hover:bg-blue-800 transition-colors shadow-lg shadow-blue-900/20">Guardar Cambios</button>
             </div>
@@ -441,7 +498,7 @@
                     </div>
                 </div>
                 
-                <!-- Info de Usuario y Usos -->
+                <!-- Info de Usuario -->
                 <div class="flex items-center gap-4">
                     <div class="flex flex-col items-end mr-2">
                          <div class="flex items-center gap-1">
@@ -467,7 +524,7 @@
             <div class="w-full md:w-1/4 flex flex-col gap-4 overflow-y-auto custom-scroll pr-1 pb-20 md:pb-0 h-full flex-shrink-0">
                 <div class="bg-white/95 backdrop-blur rounded-2xl p-6 border border-white shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col h-full overflow-y-auto custom-scroll">
                     <!-- HEADER COMPACTO -->
-                    <div class="flex items-center gap-2 mb-4 border-b border-gray-100 pb-2">
+                    <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100 pb-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-montessori-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
                         <h2 class="text-sm font-bold text-slate-800 font-montserrat">Datos de Clase</h2>
                     </div>
@@ -479,8 +536,8 @@
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Grupo (Nivel y Edad)</label>
-                            <input type="text" id="groupDetails" placeholder="Ej. 3ro Primaria (8-9 años)" required class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue text-sm font-medium">
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Grupo</label>
+                            <input type="text" id="groupDetails" placeholder="Ej. 3ro Primaria" required class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue text-sm font-medium">
                         </div>
 
                         <!-- SELECT MODERNIZADO -->
@@ -501,16 +558,20 @@
                             <input type="hidden" id="teachingStyle" value="Por Competencias">
                         </div>
                         
-                        <!-- TAREAS DIARIAS -->
-                        <div class="flex space-x-3">
-                             <div class="relative w-full">
-                                <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Tareas Diarias</label>
-                                <div class="flex rounded-lg bg-gray-100 p-1 border border-gray-200">
-                                    <button type="button" onclick="setHomework(true)" id="hw-yes" class="flex-1 py-1 text-[10px] font-bold rounded text-gray-500 hover:bg-white hover:shadow-sm transition-all">SÍ</button>
-                                    <button type="button" onclick="setHomework(false)" id="hw-no" class="flex-1 py-1 text-[10px] font-bold rounded bg-white shadow-sm text-montessori-blue border border-gray-200 transition-all">NO</button>
-                                </div>
-                                <input type="hidden" id="homeworkEnabled" value="false">
+                        <!-- SECCIÓN NUEVA: CARGA DE PLANTILLA WORD -->
+                        <div class="border-t border-gray-100 pt-3 mt-1">
+                            <label class="block text-xs font-bold text-montessori-blue uppercase tracking-wider mb-2 flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Exportar a Word
+                            </label>
+                            <div class="relative">
+                                <input type="file" id="template-upload" accept=".docx" class="hidden" onchange="handleTemplateSelect(event)">
+                                <label for="template-upload" class="flex items-center justify-between w-full px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg cursor-pointer hover:bg-blue-100 transition-colors">
+                                    <span id="template-name" class="text-xs text-blue-800 font-medium truncate max-w-[180px]">Cargar Plantilla (.docx)</span>
+                                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                </label>
                             </div>
+                            <p class="text-[9px] text-gray-400 mt-1 leading-tight">Usa etiquetas como {tema_lunes} en tu Word.</p>
                         </div>
 
                         <!-- SELECTOR DE DÍAS -->
@@ -526,38 +587,36 @@
                             <input type="hidden" id="selectedDays" value="5">
                         </div>
 
-                        <!-- TEMAS CON ALTURA COMPACTA (h-12) -->
+                        <!-- TEMAS -->
                         <div class="flex flex-col min-h-0">
                             <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Temas</label>
                             <textarea id="topics" class="w-full h-12 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue focus:ring-2 focus:ring-montessori-blue/20 outline-none transition-all duration-300 text-sm font-medium resize-none" placeholder="Describa los temas..."></textarea>
                         </div>
                         
-                        <!-- BOTÓN NUEVO: INSTRUCCIONES / RECURSOS / IMAGEN -->
                         <button type="button" id="btn-instructions" onclick="toggleInstructionsModal()" class="w-full py-2.5 px-3 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-gray-600 hover:text-montessori-blue hover:border-montessori-blue hover:bg-blue-50 transition-all duration-300 flex items-center justify-center gap-2 group">
                             <span class="text-xs font-bold truncate" id="btn-instructions-text">Añadir Instrucciones / Fotos</span>
                             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
                         </button>
                         <input type="hidden" id="customInstructions" value="">
-                        <!-- Variable global en JS manejará la imagen -->
 
                         <button type="submit" id="btn-generate" class="group relative w-full bg-montessori-blue hover:bg-blue-800 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-montessori-blue/30 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 overflow-hidden mt-4">
-                            <span class="relative z-10 flex items-center gap-2">GENERAR</span>
+                            <span class="relative z-10 flex items-center gap-2">GENERAR PLAN</span>
                             <div class="absolute inset-0 h-full w-full scale-0 rounded-2xl transition-all duration-300 group-hover:scale-100 group-hover:bg-white/10"></div>
                         </button>
                     </form>
                 </div>
             </div>
 
-            <!-- PANEL DERECHO: RESULTADOS -->
+            <!-- PANEL DERECHO: RESULTADOS (EDITOR MANUAL) -->
             <div class="w-full md:w-3/4 h-full flex flex-col relative min-h-0">
                 
-                <!-- Estado Inicial -->
+                <!-- Placeholder -->
                 <div id="result-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-white/50 backdrop-blur-sm border-2 border-dashed border-gray-300 rounded-2xl">
                     <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-4 animate-pulse-slow">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-montessori-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-700 font-montserrat mb-2">Listo para Planificar</h3>
-                    <p class="text-gray-500 text-sm max-w-sm">Completa el formulario y presiona "Generar". Puedes adjuntar fotos de libros para incluirlas.</p>
+                    <h3 class="text-xl font-bold text-gray-700 font-montserrat mb-2">Editor de Planificación</h3>
+                    <p class="text-gray-500 text-sm max-w-sm">Genera un plan con IA, edita el contenido tarjeta por tarjeta y expórtalo a tu Word personalizado.</p>
                 </div>
 
                 <!-- Loader -->
@@ -569,35 +628,36 @@
                             <div class="absolute inset-3 rounded-full border-4 border-montessori-blue border-t-transparent animate-spin" style="animation-direction: reverse; animation-duration: 2s;"></div>
                         </div>
                         <div class="text-center space-y-2">
-                            <h3 class="text-lg font-bold text-montessori-blue font-montserrat animate-pulse">Generando Planificación</h3>
-                            <div class="flex items-center justify-center gap-1">
-                                <span class="h-1.5 w-1.5 bg-montessori-red rounded-full animate-bounce" style="animation-delay: 0ms"></span>
-                                <span class="h-1.5 w-1.5 bg-montessori-red rounded-full animate-bounce" style="animation-delay: 150ms"></span>
-                                <span class="h-1.5 w-1.5 bg-montessori-red rounded-full animate-bounce" style="animation-delay: 300ms"></span>
-                            </div>
-                            <p class="text-xs text-gray-500 font-medium">Analizando requisitos e imágenes...</p>
+                            <h3 class="text-lg font-bold text-montessori-blue font-montserrat animate-pulse">Analizando Recursos...</h3>
+                            <p class="text-xs text-gray-500 font-medium">Creando actividades personalizadas...</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Contenedor de Resultados -->
+                <!-- Contenedor de Resultados con Editor -->
                 <div id="result-content" class="hidden h-full flex-col bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 relative z-10 transition-all duration-500 transform translate-y-4 opacity-0 flex-1">
-                    <!-- BARRA DE HERRAMIENTAS -->
+                    
+                    <!-- BARRA SUPERIOR -->
                     <div class="flex justify-between items-center px-4 py-2 bg-gray-50 border-b border-gray-200 flex-shrink-0 h-14">
                         <div class="flex items-center gap-2">
-                            <span class="w-2 h-8 bg-montessori-red rounded-full"></span>
-                            <div>
-                                <h3 class="font-bold text-slate-800 text-sm md:text-base leading-tight">Planificación Generada</h3>
-                                <p class="text-[10px] text-gray-500 font-medium" id="plan-meta">...</p>
-                            </div>
+                             <div class="flex flex-col">
+                                <span class="text-sm font-bold text-gray-700">Editor de Contenido</span>
+                                <span class="text-[10px] text-gray-500">Los cambios se guardarán al descargar</span>
+                             </div>
                         </div>
+                        
                         <div class="flex gap-2">
-                            <button onclick="copyToClipboard()" class="p-2 text-gray-500 hover:text-montessori-blue hover:bg-blue-50 rounded-lg transition-colors" title="Copiar Texto"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg></button>
+                            <!-- BOTÓN DESCARGA WORD -->
+                            <button id="btn-download-word" onclick="downloadWord()" class="hidden flex items-center gap-2 px-4 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-md transition-all font-bold text-xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                DESCARGAR WORD
+                            </button>
                         </div>
                     </div>
-                    <!-- ÁREA DE SCROLL INTERNO -->
-                    <div class="flex-1 overflow-y-auto custom-scroll p-8 bg-white" id="markdown-container">
-                        <div id="output-text" class="markdown-body text-sm md:text-base"></div>
+                    
+                    <!-- ÁREA DE EDICIÓN MANUAL (GRID DE TARJETAS) -->
+                    <div class="flex-1 overflow-y-auto custom-scroll p-6 bg-gray-50/50" id="editor-container">
+                        <!-- AQUÍ SE INYECTARÁN LAS TARJETAS (JS) -->
                     </div>
                 </div>
             </div>
@@ -624,11 +684,9 @@
         let selectedDays = 5;
         let currentUser = null;
         let dailyQuota = { remaining: 0, total: 0 };
-        
-        // --- GESTIÓN DE MÚLTIPLES IMÁGENES ---
-        // Array para almacenar las imágenes en Base64
         let attachedImages = [];
-        const MAX_IMAGES = 6; // ACTUALIZADO A 6
+        const MAX_IMAGES = 6;
+        let currentPlanData = null; // Almacenará el JSON original de la IA
 
         // --- PARTÍCULAS DEL FONDO ---
         const symbols = ['100', 'A+', 'A', '10', '✓', '95', 'B+', '★', '90', 'A', '100'];
@@ -676,16 +734,14 @@
         };
 
         function checkSession() {
-            // sessionStorage se borra automáticamente al cerrar la pestaña.
+            // Se mantiene sessionStorage como solicitado
             const session = sessionStorage.getItem('pinceladas_session');
             const loader = document.getElementById('initial-loader');
 
             if (session) {
                 const data = JSON.parse(session);
-                // Sesión válida, cargar interfaz directamente
                 loginUserSuccess(data.name, data.usernameUnique, true);
             } else {
-                // No hay sesión, mostrar Login
                 setTimeout(() => {
                     loader.classList.add('opacity-0');
                     setTimeout(() => loader.classList.add('hidden'), 700);
@@ -788,7 +844,8 @@
                 appContent.classList.remove('opacity-0');
                 updateQuotaDisplay();
                 initDropdowns(); 
-                setHomework(true);
+                // CORRECCIÓN APLICADA: Inicializar la selección de días
+                selectDays(selectedDays); 
             }, 100);
         }
 
@@ -822,8 +879,7 @@
             }
         }
 
-        // --- LÓGICA DEL PLANIFICADOR ---
-
+        // --- UTILIDADES ---
         function showToast(message) {
             const toast = document.getElementById("toast");
             toast.innerText = message;
@@ -836,44 +892,48 @@
             document.getElementById('selectedDays').value = days;
             for (let i = 1; i <= 5; i++) {
                 const btn = document.getElementById(`day-${i}`);
-                if (i === days) btn.classList.add('active');
-                else btn.classList.remove('active');
+                if (btn) { // Asegurarse de que el botón existe
+                    if (i === days) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
             }
         }
 
-        // --- MANEJO DE MÚLTIPLES IMÁGENES ---
+        // --- GESTIÓN DE PLANTILLA WORD ---
+        function handleTemplateSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('template-name').textContent = file.name;
+                showToast("Plantilla cargada exitosamente");
+            }
+        }
+
+        // --- IMÁGENES ---
         async function handleImageUpload(event) {
             const files = Array.from(event.target.files);
             if (files.length === 0) return;
 
-            // Verificar límite
             if (attachedImages.length + files.length > MAX_IMAGES) {
                 showToast(`Máximo ${MAX_IMAGES} imágenes permitidas.`);
-                event.target.value = ""; // Limpiar selección para reintentar
+                event.target.value = ""; 
                 return;
             }
 
-            // Mostrar estado de carga temporal
             const uploadArea = document.getElementById('upload-area');
             const originalText = uploadArea.innerHTML;
             uploadArea.innerHTML = '<span class="text-xs text-blue-500 font-bold animate-pulse">Procesando...</span>';
 
             try {
-                // Procesar todas las imágenes en paralelo
                 const compressedPromises = files.map(file => compressImage(file, 800, 0.7));
                 const newImages = await Promise.all(compressedPromises);
-
-                // Añadir a la lista global
                 attachedImages = [...attachedImages, ...newImages];
-                
                 renderImagePreviews();
-                
             } catch (err) {
                 showToast("Error al procesar alguna imagen.");
                 console.error(err);
             } finally {
                 uploadArea.innerHTML = originalText;
-                document.getElementById('image-upload').value = ""; // Reset input para permitir seleccionar más
+                document.getElementById('image-upload').value = ""; 
             }
         }
 
@@ -882,12 +942,10 @@
             const uploadArea = document.getElementById('upload-area');
             const counter = document.getElementById('img-count');
 
-            grid.innerHTML = ''; // Limpiar grid
+            grid.innerHTML = ''; 
 
             if (attachedImages.length > 0) {
                 grid.classList.remove('hidden');
-                
-                // Si llegamos al máximo, ocultamos el área de subida para no saturar UI
                 if (attachedImages.length >= MAX_IMAGES) {
                     uploadArea.classList.add('hidden');
                 } else {
@@ -897,7 +955,6 @@
                 attachedImages.forEach((base64, index) => {
                     const div = document.createElement('div');
                     div.className = "relative group rounded-lg overflow-hidden border border-gray-200 aspect-square";
-                    
                     div.innerHTML = `
                         <img src="${base64}" class="w-full h-full object-cover">
                         <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -912,17 +969,14 @@
                 grid.classList.add('hidden');
                 uploadArea.classList.remove('hidden');
             }
-
             counter.innerText = `${attachedImages.length}/${MAX_IMAGES}`;
         }
 
         function removeImage(index) {
-            // Eliminar del array
             attachedImages.splice(index, 1);
             renderImagePreviews();
         }
 
-        // Función auxiliar para comprimir imagen usando Canvas
         function compressImage(file, maxWidth, quality) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -934,18 +988,14 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-
                         if (width > maxWidth) {
                             height = Math.round((height * maxWidth) / width);
                             width = maxWidth;
                         }
-
                         canvas.width = width;
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Retornar base64 comprimido (JPEG)
                         resolve(canvas.toDataURL('image/jpeg', quality));
                     };
                     img.onerror = error => reject(error);
@@ -967,54 +1017,37 @@
             const btnText = document.getElementById('btn-instructions-text');
             
             hiddenField.value = input.value.trim();
-            
             toggleInstructionsModal();
 
-            // CAMBIO DE ESTADO DEL BOTÓN
             const hasText = hiddenField.value.length > 0;
             const imgCount = attachedImages.length;
 
             if (hasText || imgCount > 0) {
                 btn.className = "w-full py-2.5 px-3 rounded-lg bg-montessori-red text-white border border-transparent shadow-md hover:bg-red-700 transition-all duration-300 flex items-center justify-center gap-2 group";
-                
                 if (hasText && imgCount > 0) btnText.textContent = `Instrucciones + ${imgCount} Fotos`;
                 else if (imgCount > 0) btnText.textContent = `${imgCount} Fotos Adjuntadas`;
                 else btnText.textContent = "Instrucciones Guardadas";
             } else {
-                // Estado original
                 btn.className = "w-full py-2.5 px-3 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-gray-600 hover:text-montessori-blue hover:border-montessori-blue hover:bg-blue-50 transition-all duration-300 flex items-center justify-center gap-2 group";
                 btnText.textContent = "Añadir Instrucciones / Fotos";
             }
         }
 
-        // --- UI CONTROL FOR CUSTOM SELECT ---
+        // --- DROPDOWNS ---
         function initDropdowns() {}
-
         function toggleDropdown(type) {
             const list = type === 'style' ? document.getElementById('style-dropdown-list') : null;
             const chevron = type === 'style' ? document.getElementById('style-chevron') : null;
-            const isClosed = list.classList.contains('hidden');
-
-            if (isClosed && list) {
-                list.classList.remove('hidden');
-                chevron.classList.add('rotate-180');
-            } else if (list) {
-                list.classList.add('hidden');
-                chevron.classList.remove('rotate-180');
+            if (list) {
+                list.classList.toggle('hidden');
+                if(chevron) chevron.classList.toggle('rotate-180');
             }
         }
-
         function selectDropdownValue(type, value) {
-            const input = document.getElementById('teachingStyle');
-            const textDisplay = document.getElementById('selected-style-text');
-            
-            input.value = value;
-            textDisplay.textContent = value;
-            
-            const list = document.getElementById('style-dropdown-list');
-            const chevron = document.getElementById('style-chevron');
-            if (list) list.classList.add('hidden');
-            if (chevron) chevron.classList.remove('rotate-180');
+            document.getElementById('teachingStyle').value = value;
+            document.getElementById('selected-style-text').textContent = value;
+            document.getElementById('style-dropdown-list').classList.add('hidden');
+            document.getElementById('style-chevron').classList.remove('rotate-180');
         }
 
         document.addEventListener('click', function(e) {
@@ -1026,114 +1059,75 @@
             }
         });
 
-        // --- HOMEWORK TOGGLE ---
-        function setHomework(status) {
-            document.getElementById('homeworkEnabled').value = status;
-            const yesBtn = document.getElementById('hw-yes');
-            const noBtn = document.getElementById('hw-no');
-            
-            yesBtn.className = "flex-1 py-1 text-[10px] font-bold rounded transition-all";
-            noBtn.className = "flex-1 py-1 text-[10px] font-bold rounded transition-all";
-
-            if(status) {
-                yesBtn.classList.add("bg-white", "shadow-sm", "text-montessori-blue", "border", "border-gray-200");
-                noBtn.classList.add("text-gray-500", "hover:bg-white", "hover:shadow-sm");
-            } else {
-                noBtn.classList.add("bg-white", "shadow-sm", "text-montessori-blue", "border", "border-gray-200");
-                yesBtn.classList.add("text-gray-500", "hover:bg-white", "hover:shadow-sm");
-            }
-        }
-
+        // --- GENERACIÓN DE PLAN (CORE LOGIC) ---
         async function generatePlan(e) {
             e.preventDefault();
             
             if (dailyQuota.remaining <= 0) {
-                showToast("Has alcanzado tu límite diario de planificaciones.");
+                showToast("Has alcanzado tu límite diario.");
                 return;
             }
 
             const subject = document.getElementById('subject').value;
             const groupDetails = document.getElementById('groupDetails').value;
-            const style = document.getElementById('teachingStyle').value || "Tradicional";
+            const style = document.getElementById('teachingStyle').value || "Por Competencias";
             const topics = document.getElementById('topics').value;
-            const daysCount = document.getElementById('selectedDays').value;
-            const hasHomework = document.getElementById('homeworkEnabled').value === 'true';
+            const daysCount = parseInt(document.getElementById('selectedDays').value);
             const extraInstructions = document.getElementById('customInstructions').value;
 
-            // Lógica Adecuación
-            let styleInstructions = "";
-            if (style === "Adecuación Curricular") {
-                styleInstructions = `ESTILO: ADECUACIÓN CURRICULAR. Simplifica temas, desglose en pasos pequeños, enfoque visual/manipulativo. Evita teoría densa.`;
-            } else if (style === "Líder en Mí") {
-                styleInstructions = `ESTILO: LÍDER EN MÍ. Integra los 7 hábitos de Covey.`;
-            } else if (style === "Montessori") {
-                styleInstructions = `ESTILO: MONTESSORI. Enfoque en ambiente preparado, autonomía, materiales concretos.`;
-            } else if (style === "Gamificación") {
-                styleInstructions = `ESTILO: GAMIFICACIÓN. Usa dinámicas de juego, retos y narrativa lúdica.`;
+            // Prompt diseñado para devolver JSON con el esquema didáctico COMPLETO
+            const systemInstruction = `
+            Eres un planificador docente experto, pragmático y DIRECTO.
+            Genera una planificación docente para ${daysCount} días.
+            Asignatura: ${subject}
+            Grupo: ${groupDetails}
+            Tema(s): ${topics}
+            Estilo: ${style}
+            ${extraInstructions ? "Instrucciones Extra: " + extraInstructions : ""}
+            ${attachedImages.length > 0 ? "Nota: Se adjuntaron imágenes de referencia, úsalas en la planificación si es relevante." : ""}
+
+            REGLA PRINCIPAL DE TIEMPO: La suma de las actividades de INICIO, DESARROLLO y CIERRE debe ser de un total de 60 minutos (1 hora de clase).
+
+            REGLAS DE ESTILO Y NOMENCLATURA (MUY IMPORTANTE):
+            1. TEMAS PUNTUALES: El "tema" de cada día debe ser muy breve y directo (ej: "Suma de fracciones", no "Aprendiendo a sumar fracciones con alegría").
+            2. TIEMPO AL INICIO: En cada actividad, pon el tiempo PRIMERO entre paréntesis. Ejemplo: "(10 min) Lluvia de ideas sobre...".
+            3. TEXTO DIRECTO: Describe las actividades de forma fluida y directa. NO uses viñetas ni listas con puntos.
+            4. SIN TÍTULOS DE FANTASÍA: No pongas nombres creativos. Usa descripciones funcionales.
+            5. PREGUNTAS DIRECTAS: Escribe las preguntas sin etiquetas como "Pregunta generadora:".
+            6. FORMATO JSON SEGURO: Dentro de los textos, NO uses comillas dobles ("), usa comillas simples (') para evitar errores de código.
+
+            IMPORTANTE: RESPONDE ÚNICAMENTE CON UN OBJETO JSON VÁLIDO.
+            NO uses bloques de código markdown (\`\`\`json). Solo el JSON puro.
+            
+            Estructura requerida:
+            {
+              "asignatura": "${subject}",
+              "unidad": "Nombre formal de la unidad",
+              "lunes": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." },
+              "martes": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." },
+              "miercoles": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." },
+              "jueves": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." },
+              "viernes": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." }
             }
             
-            const promptConciseness = "Sé directo y funcional. Describe actividades claramente pero evita explicaciones teóricas largas. Prioriza la acción.";
-            
-            const taskInstruction = hasHomework 
-                ? "* **Tarea:** [Tarea breve opcional]" 
-                : "NO incluyas sección de Tarea.";
+            Si se piden menos de 5 días, deja las claves de los días no usados (tema, inicio, etc.) como cadenas vacías.
+            En cada sección (inicio, desarrollo, cierre), el formato debe ser: "(Tiempo) Actividad descrita directamente".
+            `;
 
-            // INYECCIÓN CUIDADOSA DE INSTRUCCIONES EXTRA
-            let instructionsBlock = "";
-            if (extraInstructions && extraInstructions.trim() !== "") {
-                instructionsBlock = `
-                IMPORTANTE - REQUISITOS ADICIONALES DEL USUARIO:
-                "${extraInstructions}"
-                
-                DIRECTIVA ESTRICTA: Integra estos materiales, recursos o adaptaciones en las actividades PERO NO CAMBIES LA EXTENSIÓN NI EL FORMATO DE LA CLASE.`;
-            }
+            const userPrompt = `Generar plan de ${daysCount} días para ${subject}.`;
 
-            // AVISO SI HAY IMÁGENES
-            if (attachedImages.length > 0) {
-                instructionsBlock += `
-                [NOTA: El usuario ha adjuntado ${attachedImages.length} imagen(es) de libros o actividades. ANALIZA LAS IMÁGENES y usa su contenido para crear las actividades solicitadas, adaptándolas si es necesario.]`;
-            }
-
-            const systemInstruction = `Eres un planificador docente experto.
-            Genera ${daysCount} clases.
-            ${styleInstructions}
-            ${promptConciseness}
-            
-            ${instructionsBlock}
-            
-            FORMATO OBLIGATORIO POR DÍA:
-            ### Clase N: [Tema]
-            * **Inicio (X min):** [Actividad]
-            * **Desarrollo (X min):** [Actividades clave]
-            * **Cierre (X min):** [Cierre]
-            ${taskInstruction}
-            
-            NO escribas introducciones ni conclusiones generales.
-            USA SIEMPRE VIÑETAS.`;
-            
-            const userPrompt = `Asignatura: ${subject}. Grupo: ${groupDetails}. Temas: ${topics}. Generar ${daysCount} días.`;
-
+            // UI Loading state
             document.getElementById('loader').classList.remove('hidden');
             document.getElementById('result-placeholder').classList.add('hidden');
+            document.getElementById('result-content').classList.add('hidden');
+            document.getElementById('btn-generate').disabled = true;
             
-            const resultContainer = document.getElementById('result-content');
-            resultContainer.classList.add('hidden');
-            resultContainer.classList.remove('flex');
-            
-            const btnGenerate = document.getElementById('btn-generate');
-            btnGenerate.disabled = true;
+            // Resetear datos actuales para evitar mezclas
+            currentPlanData = null;
 
             try {
-                // PREPARAR PAYLOAD CON IMÁGENES (ARRAY)
-                const payload = {
-                    prompt: userPrompt,
-                    systemInstruction: systemInstruction
-                };
-
-                // Si hay imágenes, enviarlas como array
-                if (attachedImages.length > 0) {
-                    payload.images = attachedImages;
-                }
+                const payload = { prompt: userPrompt, systemInstruction: systemInstruction };
+                if (attachedImages.length > 0) payload.images = attachedImages;
 
                 const response = await fetch(API_GEN_URL, {
                     method: 'POST',
@@ -1142,23 +1136,58 @@
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-                
+                if (!response.ok) {
+                    // Capturar errores HTTP específicos para mensajes al usuario
+                    if (response.status === 503 || response.status === 429) {
+                        throw new Error("Model overloaded"); // Forzamos este mensaje para capturarlo abajo
+                    }
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
                 const data = await response.json();
                 
                 if(!data.success) {
-                    throw new Error(data.error || "Error desconocido en el servidor.");
+                    // Si el error viene dentro del JSON de la API
+                    throw new Error(data.error || "Error desconocido.");
                 }
 
-                const aiText = data.text;
+                // INICIO DE LA CORRECCIÓN MEJORADA
+                let cleanText = data.text;
+                console.log("Raw AI response:", cleanText); // Para depuración
 
+                // 1. Eliminar bloques de código
+                cleanText = cleanText.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+                // 2. Localizar el bloque JSON principal
+                const startIndex = cleanText.indexOf('{');
+                const endIndex = cleanText.lastIndexOf('}');
+
+                if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
+                    throw new Error("No se encontró un bloque JSON válido en la respuesta.");
+                }
+
+                // Extraer substring
+                let jsonString = cleanText.substring(startIndex, endIndex + 1);
+
+                // 3. CORRECCIÓN ESPECÍFICA PARA EL ERROR "invalid character ','"
+                // Reemplazamos { seguido de cualquier espacio y una coma, por solo {
+                jsonString = jsonString.replace(/\{\s*,/g, '{');
+
+                // 4. Intentar parsear con JSON5 (más permisivo)
+                try {
+                    currentPlanData = JSON5.parse(jsonString);
+                    renderEditor(currentPlanData, daysCount);
+                } catch (jsonErr) {
+                    console.error("Error parseando JSON5:", jsonErr);
+                    console.error("String problemático:", jsonString);
+                    throw new Error("Error de sintaxis en el plan generado. Por favor intenta de nuevo.");
+                }
+                // FIN DE LA CORRECCIÓN MEJORADA
+
+                // Registrar uso
                 fetch(API_AUTH_URL, {
                     method: 'POST',
                     redirect: 'follow',
-                    body: JSON.stringify({
-                        action: 'registerPlannerUsage',
-                        username: currentUser
-                    })
+                    body: JSON.stringify({ action: 'registerPlannerUsage', username: currentUser })
                 }).then(res => res.json()).then(regData => {
                      if(regData.success) {
                          dailyQuota.remaining = Math.max(0, dailyQuota.remaining - 1);
@@ -1166,38 +1195,188 @@
                      }
                 });
 
-                document.getElementById('plan-meta').textContent = `${subject} • ${groupDetails} • ${daysCount} Clases`;
-                document.getElementById('output-text').innerHTML = marked.parse(aiText);
-                
                 document.getElementById('loader').classList.add('hidden');
+                const resCont = document.getElementById('result-content');
+                resCont.classList.remove('hidden');
+                resCont.classList.add('flex');
+                requestAnimationFrame(() => resCont.classList.remove('translate-y-4', 'opacity-0'));
                 
-                resultContainer.classList.remove('hidden');
-                resultContainer.classList.add('flex');
-                requestAnimationFrame(() => resultContainer.classList.remove('translate-y-4', 'opacity-0'));
+                // Mostrar botón de descarga si hay plantilla
+                const fileInput = document.getElementById('template-upload');
+                if (fileInput.files.length > 0) {
+                    document.getElementById('btn-download-word').classList.remove('hidden');
+                }
 
             } catch (error) {
-                console.error("ERROR:", error);
+                console.error("ERROR DETECTADO:", error);
                 document.getElementById('loader').classList.add('hidden');
                 document.getElementById('result-placeholder').classList.remove('hidden');
-                showToast("Error: " + (error.message.includes("404") ? "Enlace API incorrecto." : error.message));
+                
+                // MANEJO VISUAL DE ERRORES DE CONEXIÓN / SOBRECARGA
+                const errorMsg = error.message ? error.message.toLowerCase() : "";
+                
+                if (errorMsg.includes("overloaded") || errorMsg.includes("capacity") || errorMsg.includes("503") || errorMsg.includes("429")) {
+                    showToast("⚠️ Servidores saturados. Espera unos segundos e intenta de nuevo.");
+                } else {
+                    showToast("Error: " + error.message);
+                }
             } finally {
-                btnGenerate.disabled = false;
+                document.getElementById('btn-generate').disabled = false;
             }
         }
 
-        function copyToClipboard() {
-            const range = document.createRange();
-            range.selectNode(document.getElementById('output-text'));
-            window.getSelection().removeAllRanges();
-            window.getSelection().addRange(range);
-            try {
-                document.execCommand('copy');
-                showToast("¡Copiado!");
-            } catch (err) {
-                showToast("No se pudo copiar.");
+        // --- RENDERIZADO DEL EDITOR (TARJETAS) ---
+        function renderEditor(data, daysCount) {
+            const container = document.getElementById('editor-container');
+            container.innerHTML = '';
+            
+            const daysMap = [
+                { key: 'lunes', label: 'Lunes' },
+                { key: 'martes', label: 'Martes' },
+                { key: 'miercoles', label: 'Miércoles' },
+                { key: 'jueves', label: 'Jueves' },
+                { key: 'viernes', label: 'Viernes' }
+            ];
+
+            // Renderizar tarjetas solo para los días seleccionados
+            for(let i = 0; i < daysCount; i++) {
+                const dayInfo = daysMap[i];
+                const dayData = data[dayInfo.key] || {};
+                
+                const card = document.createElement('div');
+                card.className = 'plan-card';
+                card.innerHTML = `
+                    <h3 class="day-header">${dayInfo.label}</h3>
+                    
+                    <label class="section-label">Tema / Contenido</label>
+                    <textarea id="topic_${dayInfo.key}" class="editable-field field-topic" placeholder="Tema del día...">${dayData.tema || ''}</textarea>
+                    
+                    <label class="section-label">1. INICIO (Secuencia Didáctica)</label>
+                    <textarea id="inicio_${dayInfo.key}" class="editable-field" style="height: 5rem;" placeholder="Actividades de inicio (X min)...">${dayData.inicio || ''}</textarea>
+                    
+                    <label class="section-label">2. DESARROLLO (Secuencia Didáctica)</label>
+                    <textarea id="desarrollo_${dayInfo.key}" class="editable-field" style="height: 8rem;" placeholder="Actividades clave del desarrollo...">${dayData.desarrollo || ''}</textarea>
+                    
+                    <label class="section-label">3. CIERRE (Secuencia Didáctica)</label>
+                    <textarea id="cierre_${dayInfo.key}" class="editable-field" style="height: 5rem;" placeholder="Actividades de cierre y evaluación (X min)...">${dayData.cierre || ''}</textarea>
+
+                    <label class="section-label">TAREA (Opcional)</label>
+                    <textarea id="tarea_${dayInfo.key}" class="editable-field" style="height: 3rem;" placeholder="Tarea para casa o actividad extra...">${dayData.tarea || ''}</textarea>
+                `;
+                container.appendChild(card);
             }
-            window.getSelection().removeAllRanges();
         }
+
+        // --- DESCARGA WORD ---
+        function downloadWord() {
+            const fileInput = document.getElementById('template-upload');
+            if (fileInput.files.length === 0) {
+                showToast("Sube tu plantilla .docx primero");
+                return;
+            }
+
+            // PREPARAR DATOS (Manejo seguro de currentPlanData)
+            const safePlanData = currentPlanData || {};
+            
+            const finalData = {
+                // Información general
+                asignatura: getValueOrEmpty('subject'),
+                unidad: safePlanData.unidad || "Unidad no definida",
+                // Lunes
+                tema_lunes: getValueOrEmpty('topic_lunes'),
+                inicio_lunes: getValueOrEmpty('inicio_lunes'),
+                desarrollo_lunes: getValueOrEmpty('desarrollo_lunes'),
+                cierre_lunes: getValueOrEmpty('cierre_lunes'),
+                tarea_lunes: getValueOrEmpty('tarea_lunes'),
+                // Martes
+                tema_martes: getValueOrEmpty('topic_martes'),
+                inicio_martes: getValueOrEmpty('inicio_martes'),
+                desarrollo_martes: getValueOrEmpty('desarrollo_martes'),
+                cierre_martes: getValueOrEmpty('cierre_martes'),
+                tarea_martes: getValueOrEmpty('tarea_martes'),
+                // Miércoles
+                tema_miercoles: getValueOrEmpty('topic_miercoles'),
+                inicio_miercoles: getValueOrEmpty('inicio_miercoles'),
+                desarrollo_miercoles: getValueOrEmpty('desarrollo_miercoles'),
+                cierre_miercoles: getValueOrEmpty('cierre_miercoles'),
+                tarea_miercoles: getValueOrEmpty('tarea_miercoles'),
+                // Jueves
+                tema_jueves: getValueOrEmpty('topic_jueves'),
+                inicio_jueves: getValueOrEmpty('inicio_jueves'),
+                desarrollo_jueves: getValueOrEmpty('desarrollo_jueves'),
+                cierre_jueves: getValueOrEmpty('cierre_jueves'),
+                tarea_jueves: getValueOrEmpty('tarea_jueves'),
+                // Viernes
+                tema_viernes: getValueOrEmpty('topic_viernes'),
+                inicio_viernes: getValueOrEmpty('inicio_viernes'),
+                desarrollo_viernes: getValueOrEmpty('desarrollo_viernes'),
+                cierre_viernes: getValueOrEmpty('cierre_viernes'),
+                tarea_viernes: getValueOrEmpty('tarea_viernes'),
+            };
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    // VERIFICACIÓN DE SEGURIDAD
+                    if (typeof window.PizZip !== 'function') {
+                         throw new Error("La librería PizZip no se ha cargado correctamente.");
+                    }
+
+                    const zip = new window.PizZip(evt.target.result);
+                    const doc = new window.docxtemplater(zip, {
+                        paragraphLoop: true,
+                        linebreaks: true,
+                        // FIX CRÍTICO: nullGetter para evitar errores XTTemplateError si falta un dato
+                        nullGetter: function(part) {
+                            return ""; 
+                        }
+                    });
+
+                    doc.render(finalData);
+
+                    const out = doc.getZip().generate({
+                        type: "blob",
+                        mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    });
+
+                    saveAs(out, `Plan_${finalData.asignatura.replace(/\s+/g, '_')}_Semana.docx`);
+                    showToast("¡Descarga iniciada!");
+
+                } catch (error) {
+                    console.error("Error detallado en DocxTemplater:", error);
+                    if (error.properties && error.properties.errors) {
+                        // Si es un error múltiple de docxtemplater, mostrar detalles
+                        error.properties.errors.forEach(function(err) {
+                            console.log(err);
+                        });
+                    }
+                    
+                    if (error.message.includes("PizZip")) {
+                        showToast("Error de Librería: Recarga la página e intenta de nuevo.");
+                    } else {
+                        showToast("Error al generar Word. Revisa que tu plantilla use las etiquetas correctas.");
+                    }
+                }
+            };
+            reader.onerror = function(error) {
+                console.error("Error leyendo archivo:", error);
+                showToast("Error leyendo la plantilla. Asegúrate de que es un archivo .docx válido.");
+            };
+            reader.readAsBinaryString(fileInput.files[0]);
+        }
+
+        function getValueOrEmpty(id) {
+            const el = document.getElementById(id);
+            // Si no es un elemento de tarjeta (como subject), intenta obtener el valor.
+            // Si es un elemento de tarjeta, el ID no será topic_lunes, etc., sino el ID del textarea.
+            if (el && el.tagName === 'TEXTAREA') {
+                return el.value;
+            }
+            // Para inputs simples (subject, groupDetails)
+            const input = document.getElementById(id);
+            return input ? input.value : '';
+        }
+
     </script>
 </body>
 </html>
