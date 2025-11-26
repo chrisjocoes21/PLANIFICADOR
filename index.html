@@ -2,7 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- FIX UX: Evita zoom automático en inputs en iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Planificador Docente - Pinceladas Montessori</title>
     
     <!-- OPTIMIZACIÓN DE CONEXIÓN -->
@@ -21,12 +22,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.49.1/docxtemplater.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
-    <!-- JSON5 para parsing robusto -->
+    <!-- FIX FUNCIONAL: JSON5 para parsing robusto de respuestas IA -->
     <script src="https://unpkg.com/json5@2/dist/index.min.js"></script>
     
-    <!-- Markdown Parser -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -90,6 +88,7 @@
         * {
             -ms-overflow-style: none;
             scrollbar-width: none;
+            touch-action: manipulation;
         }
 
         .custom-scroll { 
@@ -167,7 +166,7 @@
         .logo-lg .text-pinceladas { font-size: clamp(2.5rem, 6vw, 3.2rem); }
         .logo-lg .text-montessori-sub { font-size: clamp(1rem, 2.5vw, 1.2rem); }
 
-        /* Estilos del Editor Manual (Resultados) */
+        /* Estilos del Editor Manual */
         .plan-card {
             border: 1px solid #e5e7eb;
             border-radius: 0.75rem;
@@ -177,9 +176,7 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             transition: all 0.2s;
         }
-        .plan-card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
+        .plan-card:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         
         .day-header {
             color: #C00000;
@@ -207,13 +204,18 @@
             padding: 0.5rem 0.75rem;
             border: 1px solid #e2e8f0;
             border-radius: 0.5rem;
-            font-size: 0.9rem;
+            /* FIX UX: text-base en mobile previene zoom */
+            font-size: 16px; 
             line-height: 1.5;
             color: #334155;
             background-color: #f8fafc;
             transition: all 0.2s;
             resize: none;
             outline: none;
+        }
+
+        @media (min-width: 768px) {
+            .editable-field { font-size: 0.875rem; }
         }
         
         .editable-field:focus {
@@ -245,11 +247,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        #toast.show {
-            visibility: visible;
-            opacity: 1;
-            bottom: 50px;
-        }
+        #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
 
         /* --- ANIMACIONES GENERALES --- */
         @keyframes colorPulse { 
@@ -262,9 +260,7 @@
         .animate-pulse-color { animation: colorPulse 8s ease-in-out infinite; }
         
         .fade-out { animation: fadeOut 0.4s ease-out forwards; }
-        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.99); pointer-events: none; } }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.99); } to { opacity: 1; transform: scale(1); } }
         
         /* Loader circular (Login) */
         .loader {
@@ -379,13 +375,14 @@
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg class="w-4 h-4 text-gray-600 group-focus-within:text-montessori-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                                     </div>
-                                    <input type="text" id="username" required class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue focus:ring-2 focus:ring-montessori-blue/20 outline-none transition-all duration-500 text-sm placeholder-gray-600" placeholder="Usuario">
+                                    <!-- FIX UX: text-base en inputs para evitar zoom en iOS -->
+                                    <input type="text" id="username" required class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue focus:ring-2 focus:ring-montessori-blue/20 outline-none transition-all duration-500 text-base md:text-sm placeholder-gray-600" placeholder="Usuario">
                                 </div>
                                 <div class="relative group z-20">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <svg class="w-4 h-4 text-gray-600 group-focus-within:text-montessori-blue transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                                     </div>
-                                    <input type="password" id="password" required class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue focus:ring-2 focus:ring-montessori-blue/20 outline-none transition-all duration-500 text-sm placeholder-gray-600" placeholder="Contraseña">
+                                    <input type="password" id="password" required class="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue focus:ring-2 focus:ring-montessori-blue/20 outline-none transition-all duration-500 text-base md:text-sm placeholder-gray-600" placeholder="Contraseña">
                                 </div>
                             </div>
                         </div>
@@ -428,9 +425,8 @@
         </div>
     </div>
     
-    <!-- MODAL INSTRUCCIONES MEJORADO (AMPLIADO Y SIN SALTOS) -->
+    <!-- MODAL INSTRUCCIONES MEJORADO -->
     <div id="instructions-modal" class="hidden fixed inset-0 z-[250] flex items-center justify-center bg-black/40 backdrop-blur-sm">
-        <!-- CLASE CAMBIADA: max-w-4xl para más anchura, h-[80vh] para altura fija -->
         <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-4xl w-full mx-4 border border-gray-100 flex flex-col h-[85vh] transition-all transform duration-300">
             <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100 flex-shrink-0">
                 <h3 class="text-lg font-bold text-montessori-blue font-montserrat flex items-center gap-2">
@@ -532,12 +528,13 @@
                     <form id="plannerForm" class="space-y-3 flex-1 flex flex-col" onsubmit="generatePlan(event)">
                         <div>
                             <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Asignatura</label>
-                            <input type="text" id="subject" placeholder="Ingrese la Asignatura" required class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue text-sm font-medium">
+                            <!-- FIX UX: text-base en inputs para evitar zoom en iOS -->
+                            <input type="text" id="subject" placeholder="Ingrese la Asignatura" required class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue text-base md:text-sm font-medium">
                         </div>
                         
                         <div>
                             <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Grupo</label>
-                            <input type="text" id="groupDetails" placeholder="Ej. 3ro Primaria" required class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue text-sm font-medium">
+                            <input type="text" id="groupDetails" placeholder="Ej. 3ro Primaria" required class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue text-base md:text-sm font-medium">
                         </div>
 
                         <!-- SELECT MODERNIZADO -->
@@ -590,7 +587,8 @@
                         <!-- TEMAS -->
                         <div class="flex flex-col min-h-0">
                             <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Temas</label>
-                            <textarea id="topics" class="w-full h-12 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue focus:ring-2 focus:ring-montessori-blue/20 outline-none transition-all duration-300 text-sm font-medium resize-none" placeholder="Describa los temas..."></textarea>
+                            <!-- FIX UX: text-base en inputs para evitar zoom en iOS -->
+                            <textarea id="topics" class="w-full h-12 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue focus:ring-2 focus:ring-montessori-blue/20 outline-none transition-all duration-300 text-base md:text-sm font-medium resize-none" placeholder="Describa los temas..."></textarea>
                         </div>
                         
                         <button type="button" id="btn-instructions" onclick="toggleInstructionsModal()" class="w-full py-2.5 px-3 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-gray-600 hover:text-montessori-blue hover:border-montessori-blue hover:bg-blue-50 transition-all duration-300 flex items-center justify-center gap-2 group">
@@ -734,7 +732,6 @@
         };
 
         function checkSession() {
-            // Se mantiene sessionStorage como solicitado
             const session = sessionStorage.getItem('pinceladas_session');
             const loader = document.getElementById('initial-loader');
 
@@ -844,7 +841,6 @@
                 appContent.classList.remove('opacity-0');
                 updateQuotaDisplay();
                 initDropdowns(); 
-                // CORRECCIÓN APLICADA: Inicializar la selección de días
                 selectDays(selectedDays); 
             }, 100);
         }
@@ -892,7 +888,7 @@
             document.getElementById('selectedDays').value = days;
             for (let i = 1; i <= 5; i++) {
                 const btn = document.getElementById(`day-${i}`);
-                if (btn) { // Asegurarse de que el botón existe
+                if (btn) {
                     if (i === days) btn.classList.add('active');
                     else btn.classList.remove('active');
                 }
@@ -1058,6 +1054,57 @@
                 document.getElementById('style-chevron').classList.remove('rotate-180');
             }
         });
+        
+        // --- HELPER DE REINTENTO ---
+        async function fetchWithRetry(url, options, retries = 3, delay = 2000) {
+            let lastError;
+            let lastResponse;
+
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    
+                    // Check HTTP status
+                    if (response.status === 503 || response.status === 429) {
+                        throw new Error("HTTP_OVERLOAD");
+                    }
+
+                    // Check API specific Logical error (Model Overloaded often comes as 200 OK in GAS proxies)
+                    // We must clone because we consume the stream
+                    const clone = response.clone();
+                    try {
+                        const data = await clone.json();
+                        // Check for specific "overloaded" or "capacity" messages in the error field
+                        if (data.success === false) {
+                            const err = (data.error || "").toLowerCase();
+                            if (err.includes("overloaded") || err.includes("capacity") || err.includes("too many requests")) {
+                                throw new Error("LOGICAL_OVERLOAD");
+                            }
+                        }
+                    } catch (jsonErr) {
+                        // If it's not JSON, ignore and let main logic handle
+                    }
+
+                    return response; // Return valid response (success or non-retryable error)
+
+                } catch (err) {
+                    lastError = err;
+                    // If it's the last retry, throw
+                    if (i === retries - 1) throw err;
+
+                    // Update UI
+                    const loaderSubtitle = document.querySelector('#loader p');
+                    if (loaderSubtitle) loaderSubtitle.innerText = `Servidores ocupados. Reintentando (${i+1}/${retries})...`;
+                    
+                    console.warn(`Retry ${i+1}/${retries} due to: ${err.message}`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 1.5; // Exponential backoff
+                }
+            }
+            
+            if (lastError) throw lastError;
+            return lastResponse;
+        }
 
         // --- GENERACIÓN DE PLAN (CORE LOGIC) ---
         async function generatePlan(e) {
@@ -1075,9 +1122,9 @@
             const daysCount = parseInt(document.getElementById('selectedDays').value);
             const extraInstructions = document.getElementById('customInstructions').value;
 
-            // Prompt diseñado para devolver JSON con el esquema didáctico COMPLETO
+            // Prompt diseñado para devolver JSON
             const systemInstruction = `
-            Eres un planificador docente experto, pragmático y DIRECTO.
+            Eres un planificador docente experto.
             Genera una planificación docente para ${daysCount} días.
             Asignatura: ${subject}
             Grupo: ${groupDetails}
@@ -1086,18 +1133,20 @@
             ${extraInstructions ? "Instrucciones Extra: " + extraInstructions : ""}
             ${attachedImages.length > 0 ? "Nota: Se adjuntaron imágenes de referencia, úsalas en la planificación si es relevante." : ""}
 
+            IMPORTANTE: DEBES GENERAR LOS 5 DÍAS SOLICITADOS SI EL USUARIO LOS PIDE.
+            Si el contenido es muy largo, REDUCE la longitud de las descripciones para asegurar que la respuesta completa (JSON cerrado) quepa en el límite de tokens. Prioriza completar la ESTRUCTURA de los 5 días sobre el detalle excesivo.
+
             REGLA PRINCIPAL DE TIEMPO: La suma de las actividades de INICIO, DESARROLLO y CIERRE debe ser de un total de 60 minutos (1 hora de clase).
 
-            REGLAS DE ESTILO Y NOMENCLATURA (MUY IMPORTANTE):
-            1. TEMAS PUNTUALES: El "tema" de cada día debe ser muy breve y directo (ej: "Suma de fracciones", no "Aprendiendo a sumar fracciones con alegría").
-            2. TIEMPO AL INICIO: En cada actividad, pon el tiempo PRIMERO entre paréntesis. Ejemplo: "(10 min) Lluvia de ideas sobre...".
-            3. TEXTO DIRECTO: Describe las actividades de forma fluida y directa. NO uses viñetas ni listas con puntos.
-            4. SIN TÍTULOS DE FANTASÍA: No pongas nombres creativos. Usa descripciones funcionales.
-            5. PREGUNTAS DIRECTAS: Escribe las preguntas sin etiquetas como "Pregunta generadora:".
-            6. FORMATO JSON SEGURO: Dentro de los textos, NO uses comillas dobles ("), usa comillas simples (') para evitar errores de código.
+            REGLAS DE ESTILO Y NOMENCLATURA:
+            1. TEMAS PUNTUALES: El "tema" de cada día debe ser breve.
+            2. TIEMPO AL INICIO: En cada actividad, pon el tiempo PRIMERO entre paréntesis. Ejemplo: "(10 min) Lluvia de ideas...".
+            3. TEXTO DIRECTO: Describe las actividades de forma fluida.
+            4. SIN TÍTULOS DE FANTASÍA.
+            5. PREGUNTAS DIRECTAS.
+            6. FORMATO JSON SEGURO: Dentro de los textos, usa comillas simples (') para evitar romper el JSON.
 
             IMPORTANTE: RESPONDE ÚNICAMENTE CON UN OBJETO JSON VÁLIDO.
-            NO uses bloques de código markdown (\`\`\`json). Solo el JSON puro.
             
             Estructura requerida:
             {
@@ -1110,26 +1159,23 @@
               "viernes": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." }
             }
             
-            Si se piden menos de 5 días, deja las claves de los días no usados (tema, inicio, etc.) como cadenas vacías.
-            En cada sección (inicio, desarrollo, cierre), el formato debe ser: "(Tiempo) Actividad descrita directamente".
+            Si se piden menos de 5 días, deja las claves de los días no usados como cadenas vacías.
             `;
 
             const userPrompt = `Generar plan de ${daysCount} días para ${subject}.`;
 
-            // UI Loading state
             document.getElementById('loader').classList.remove('hidden');
             document.getElementById('result-placeholder').classList.add('hidden');
             document.getElementById('result-content').classList.add('hidden');
             document.getElementById('btn-generate').disabled = true;
             
-            // Resetear datos actuales para evitar mezclas
             currentPlanData = null;
 
             try {
                 const payload = { prompt: userPrompt, systemInstruction: systemInstruction };
                 if (attachedImages.length > 0) payload.images = attachedImages;
 
-                const response = await fetch(API_GEN_URL, {
+                const response = await fetchWithRetry(API_GEN_URL, {
                     method: 'POST',
                     redirect: 'follow',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1137,51 +1183,87 @@
                 });
 
                 if (!response.ok) {
-                    // Capturar errores HTTP específicos para mensajes al usuario
                     if (response.status === 503 || response.status === 429) {
-                        throw new Error("Model overloaded"); // Forzamos este mensaje para capturarlo abajo
+                        throw new Error("Model overloaded");
                     }
                     throw new Error(`Error HTTP: ${response.status}`);
                 }
+
                 const data = await response.json();
                 
                 if(!data.success) {
-                    // Si el error viene dentro del JSON de la API
                     throw new Error(data.error || "Error desconocido.");
                 }
 
-                // INICIO DE LA CORRECCIÓN MEJORADA
+                // LIMPIEZA Y PARSING ROBUSTO
                 let cleanText = data.text;
-                console.log("Raw AI response:", cleanText); // Para depuración
-
-                // 1. Eliminar bloques de código
                 cleanText = cleanText.replace(/```json/gi, '').replace(/```/g, '').trim();
-
-                // 2. Localizar el bloque JSON principal
+                
                 const startIndex = cleanText.indexOf('{');
-                const endIndex = cleanText.lastIndexOf('}');
-
-                if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
-                    throw new Error("No se encontró un bloque JSON válido en la respuesta.");
+                if (startIndex === -1) throw new Error("No se encontró un bloque JSON válido.");
+                
+                // Intento 1: Extracción estricta (asumiendo que hay un cierre })
+                const lastIndex = cleanText.lastIndexOf('}');
+                let jsonCandidate = "";
+                
+                if (lastIndex > startIndex) {
+                    jsonCandidate = cleanText.substring(startIndex, lastIndex + 1);
+                } else {
+                    // Si no hay cierre, tomamos todo hasta el final (truncado severo)
+                    jsonCandidate = cleanText.substring(startIndex);
                 }
 
-                // Extraer substring
-                let jsonString = cleanText.substring(startIndex, endIndex + 1);
+                // Corrección de coma inicial
+                jsonCandidate = jsonCandidate.replace(/\{\s*,/g, '{');
 
-                // 3. CORRECCIÓN ESPECÍFICA PARA EL ERROR "invalid character ','"
-                // Reemplazamos { seguido de cualquier espacio y una coma, por solo {
-                jsonString = jsonString.replace(/\{\s*,/g, '{');
-
-                // 4. Intentar parsear con JSON5 (más permisivo)
                 try {
-                    currentPlanData = JSON5.parse(jsonString);
-                    renderEditor(currentPlanData, daysCount);
-                } catch (jsonErr) {
-                    console.error("Error parseando JSON5:", jsonErr);
-                    console.error("String problemático:", jsonString);
-                    throw new Error("Error de sintaxis en el plan generado. Por favor intenta de nuevo.");
+                    currentPlanData = JSON5.parse(jsonCandidate);
+                } catch (e) {
+                    // SI FALLA: Estrategia de Reparación por Truncamiento
+                    console.warn("JSON inicial inválido, intentando reparar...", e.message);
+                    
+                    // Si falló el estricto, puede ser que el lastIndex fuera interno y no el final real (si estaba truncado).
+                    // Probamos tomando TODO el texto restante y cerrando llaves.
+                    let looseCandidate = cleanText.substring(startIndex);
+                    let repaired = false;
+
+                    // Intentamos cerrar hasta 5 llaves (ej: root -> lunes -> inicio)
+                    let suffix = "";
+                    for(let i=0; i<10; i++) { // Intentar cerrar brackets/llaves
+                        suffix += "}";
+                        try {
+                            currentPlanData = JSON5.parse(looseCandidate + suffix);
+                            repaired = true;
+                            break;
+                        } catch(err) {
+                            // Si falla, probar cerrar comillas primero
+                             try {
+                                currentPlanData = JSON5.parse(looseCandidate + '"' + suffix);
+                                repaired = true;
+                                break;
+                            } catch(err2) { /* continue */ }
+                        }
+                    }
+                    
+                    if (!repaired) {
+                        // Último intento: Usar el candidato estricto original y tratar de cerrarlo
+                        // (Por si había texto basura al final que confundió al looseCandidate)
+                        suffix = "";
+                        for(let i=0; i<5; i++) {
+                            suffix += "}";
+                            try {
+                                currentPlanData = JSON5.parse(jsonCandidate + suffix);
+                                repaired = true;
+                                break;
+                            } catch(err) {}
+                        }
+                    }
+
+                    if (!repaired) throw new Error("La IA generó una respuesta incompleta que no se pudo reparar automáticamente.");
                 }
-                // FIN DE LA CORRECCIÓN MEJORADA
+                
+                // Si llegamos aquí, currentPlanData tiene datos válidos (reparados o no)
+                renderEditor(currentPlanData, daysCount);
 
                 // Registrar uso
                 fetch(API_AUTH_URL, {
@@ -1201,26 +1283,28 @@
                 resCont.classList.add('flex');
                 requestAnimationFrame(() => resCont.classList.remove('translate-y-4', 'opacity-0'));
                 
-                // Mostrar botón de descarga si hay plantilla
                 const fileInput = document.getElementById('template-upload');
                 if (fileInput.files.length > 0) {
                     document.getElementById('btn-download-word').classList.remove('hidden');
                 }
 
             } catch (error) {
-                console.error("ERROR DETECTADO:", error);
+                console.error("ERROR:", error);
                 document.getElementById('loader').classList.add('hidden');
                 document.getElementById('result-placeholder').classList.remove('hidden');
                 
-                // MANEJO VISUAL DE ERRORES DE CONEXIÓN / SOBRECARGA
                 const errorMsg = error.message ? error.message.toLowerCase() : "";
-                
                 if (errorMsg.includes("overloaded") || errorMsg.includes("capacity") || errorMsg.includes("503") || errorMsg.includes("429")) {
-                    showToast("⚠️ Servidores saturados. Espera unos segundos e intenta de nuevo.");
+                    showToast("⚠️ Servidores saturados. Reintentando...");
                 } else {
                     showToast("Error: " + error.message);
                 }
             } finally {
+                const loaderTitle = document.querySelector('#loader h3');
+                const loaderSubtitle = document.querySelector('#loader p');
+                if (loaderTitle) loaderTitle.innerText = "Analizando Recursos...";
+                if (loaderSubtitle) loaderSubtitle.innerText = "Creando actividades personalizadas...";
+                
                 document.getElementById('btn-generate').disabled = false;
             }
         }
@@ -1238,7 +1322,6 @@
                 { key: 'viernes', label: 'Viernes' }
             ];
 
-            // Renderizar tarjetas solo para los días seleccionados
             for(let i = 0; i < daysCount; i++) {
                 const dayInfo = daysMap[i];
                 const dayData = data[dayInfo.key] || {};
@@ -1268,6 +1351,15 @@
         }
 
         // --- DESCARGA WORD ---
+        // FIX FUNCIONAL: Lógica robusta para evitar errores si faltan campos
+        function getValueOrEmpty(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                return el.value || ''; // Si existe pero es null/undefined, retorna ''
+            }
+            return ''; // Si no existe el elemento, retorna ''
+        }
+
         function downloadWord() {
             const fileInput = document.getElementById('template-upload');
             if (fileInput.files.length === 0) {
@@ -1275,9 +1367,9 @@
                 return;
             }
 
-            // PREPARAR DATOS (Manejo seguro de currentPlanData)
             const safePlanData = currentPlanData || {};
             
+            // Usamos getValueOrEmpty para garantizar que no haya nulls
             const finalData = {
                 // Información general
                 asignatura: getValueOrEmpty('subject'),
@@ -1317,7 +1409,6 @@
             const reader = new FileReader();
             reader.onload = function(evt) {
                 try {
-                    // VERIFICACIÓN DE SEGURIDAD
                     if (typeof window.PizZip !== 'function') {
                          throw new Error("La librería PizZip no se ha cargado correctamente.");
                     }
@@ -1326,10 +1417,8 @@
                     const doc = new window.docxtemplater(zip, {
                         paragraphLoop: true,
                         linebreaks: true,
-                        // FIX CRÍTICO: nullGetter para evitar errores XTTemplateError si falta un dato
-                        nullGetter: function(part) {
-                            return ""; 
-                        }
+                        // nullGetter previene errores si algún dato se escapó como null
+                        nullGetter: function(part) { return ""; }
                     });
 
                     doc.render(finalData);
@@ -1343,38 +1432,14 @@
                     showToast("¡Descarga iniciada!");
 
                 } catch (error) {
-                    console.error("Error detallado en DocxTemplater:", error);
+                    console.error("Error DocxTemplater:", error);
                     if (error.properties && error.properties.errors) {
-                        // Si es un error múltiple de docxtemplater, mostrar detalles
-                        error.properties.errors.forEach(function(err) {
-                            console.log(err);
-                        });
+                        error.properties.errors.forEach(function(err) { console.log(err); });
                     }
-                    
-                    if (error.message.includes("PizZip")) {
-                        showToast("Error de Librería: Recarga la página e intenta de nuevo.");
-                    } else {
-                        showToast("Error al generar Word. Revisa que tu plantilla use las etiquetas correctas.");
-                    }
+                    showToast("Error al generar Word. Revisa tu plantilla.");
                 }
             };
-            reader.onerror = function(error) {
-                console.error("Error leyendo archivo:", error);
-                showToast("Error leyendo la plantilla. Asegúrate de que es un archivo .docx válido.");
-            };
             reader.readAsBinaryString(fileInput.files[0]);
-        }
-
-        function getValueOrEmpty(id) {
-            const el = document.getElementById(id);
-            // Si no es un elemento de tarjeta (como subject), intenta obtener el valor.
-            // Si es un elemento de tarjeta, el ID no será topic_lunes, etc., sino el ID del textarea.
-            if (el && el.tagName === 'TEXTAREA') {
-                return el.value;
-            }
-            // Para inputs simples (subject, groupDetails)
-            const input = document.getElementById(id);
-            return input ? input.value : '';
         }
 
     </script>
