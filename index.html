@@ -830,10 +830,14 @@
             loginScreen.classList.add('fade-out');
             setTimeout(() => loginScreen.classList.add('hidden'), 500);
             
+            // FIX LOGICO: Siempre ocultar loader, incluso en auto-login (F5)
             if(!isAutoLogin) {
                  loader.classList.add('hidden');
             } else {
                 refreshQuota(usernameUnique);
+                // Añadimos efecto de salida suave para el loader inicial en F5
+                loader.classList.add('opacity-0');
+                setTimeout(() => loader.classList.add('hidden'), 700);
             }
 
             appContent.classList.remove('hidden');
