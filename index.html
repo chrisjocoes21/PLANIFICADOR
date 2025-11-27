@@ -22,7 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.49.1/docxtemplater.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
-    <!-- FIX FUNCIONAL: JSON5 para parsing robusto de respuestas IA -->
+    <!-- FIX FUNCIONAL: JSON5 para parsing robusto de respuestas del sistema -->
     <script src="https://unpkg.com/json5@2/dist/index.min.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -539,16 +539,15 @@
 
                         <!-- SELECT MODERNIZADO -->
                         <div class="relative custom-select-container">
-                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Estilo Pedagógico</label>
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Modelo Pedagógico</label>
                             <div id="style-dropdown-btn" class="custom-select-trigger" onclick="toggleDropdown('style')">
                                 <span id="selected-style-text">Por Competencias</span>
                                 <svg class="h-4 w-4 text-gray-600 transform transition-transform duration-200" id="style-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                             </div>
                             <div id="style-dropdown-list" class="custom-dropdown-list hidden">
-                                <button type="button" onclick="selectDropdownValue('style', 'Tradicional')">Tradicional</button>
                                 <button type="button" onclick="selectDropdownValue('style', 'Montessori')">Montessori</button>
-                                <button type="button" onclick="selectDropdownValue('style', 'Gamificación')">Gamificación</button>
                                 <button type="button" onclick="selectDropdownValue('style', 'Líder en Mí')">Líder en Mí</button>
+                                <button type="button" onclick="selectDropdownValue('style', 'Tradicional')">Tradicional</button>
                                 <button type="button" onclick="selectDropdownValue('style', 'Adecuación Curricular')">Adecuación Curricular</button>
                                 <button type="button" onclick="selectDropdownValue('style', 'Enseñanza por Competencias')">Enseñanza por Competencias</button>
                             </div>
@@ -614,7 +613,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-montessori-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                     </div>
                     <h3 class="text-xl font-bold text-gray-700 font-montserrat mb-2">Editor de Planificación</h3>
-                    <p class="text-gray-500 text-sm max-w-sm">Genera un plan con IA, edita el contenido tarjeta por tarjeta y expórtalo a tu Word personalizado.</p>
+                    <p class="text-gray-500 text-sm max-w-sm">Genera un plan con el sistema, edita el contenido tarjeta por tarjeta y expórtalo a tu Word personalizado.</p>
                 </div>
 
                 <!-- Loader -->
@@ -684,10 +683,11 @@
         let dailyQuota = { remaining: 0, total: 0 };
         let attachedImages = [];
         const MAX_IMAGES = 6;
-        let currentPlanData = null; // Almacenará el JSON original de la IA
+        let currentPlanData = null; // Almacenará el JSON original de la herramienta
 
         // --- PARTÍCULAS DEL FONDO ---
-        const symbols = ['100', 'A+', 'A', '10', '✓', '95', 'B+', '★', '90', 'A', '100'];
+        // CAMBIO: Símbolos pedagógicos en lugar de números de calificaciones
+        const symbols = ['Inicio', 'Desarrollo', 'Cierre', 'Obj.', 'Meta', 'Tiempo', 'Recursos', 'Eval.', 'Actividad', 'Plan', 'Clase'];
 
         function initAllParticles() {
             const containers = document.querySelectorAll('.particles-container');
@@ -1133,7 +1133,7 @@
             ${extraInstructions ? "Instrucciones Extra: " + extraInstructions : ""}
             ${attachedImages.length > 0 ? "Nota: Se adjuntaron imágenes de referencia, úsalas en la planificación si es relevante." : ""}
 
-            IMPORTANTE: DEBES GENERAR LOS 5 DÍAS SOLICITADOS SI EL USUARIO LOS PIDE.
+            IMPORTANTE: DEBES GENERAR LOS 5 DÍAS SOLICITADOS SI EL USUARIO LOS PIDEN.
             Si el contenido es muy largo, REDUCE la longitud de las descripciones para asegurar que la respuesta completa (JSON cerrado) quepa en el límite de tokens. Prioriza completar la ESTRUCTURA de los 5 días sobre el detalle excesivo.
 
             REGLA PRINCIPAL DE TIEMPO: La suma de las actividades de INICIO, DESARROLLO y CIERRE debe ser de un total de 60 minutos (1 hora de clase).
@@ -1217,6 +1217,7 @@
                 jsonCandidate = jsonCandidate.replace(/\{\s*,/g, '{');
 
                 try {
+                    // La data es generada por la herramienta
                     currentPlanData = JSON5.parse(jsonCandidate);
                 } catch (e) {
                     // SI FALLA: Estrategia de Reparación por Truncamiento
@@ -1259,7 +1260,7 @@
                         }
                     }
 
-                    if (!repaired) throw new Error("La IA generó una respuesta incompleta que no se pudo reparar automáticamente.");
+                    if (!repaired) throw new Error("El sistema generó una respuesta incompleta que no se pudo reparar automáticamente.");
                 }
                 
                 // Si llegamos aquí, currentPlanData tiene datos válidos (reparados o no)
@@ -1367,6 +1368,7 @@
                 return;
             }
 
+            // La data es generada por la herramienta
             const safePlanData = currentPlanData || {};
             
             // Usamos getValueOrEmpty para garantizar que no haya nulls
@@ -1428,7 +1430,47 @@
                         mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     });
 
-                    saveAs(out, `Plan_${finalData.asignatura.replace(/\s+/g, '_')}_Semana.docx`);
+                    // --- INICIO DE MODIFICACIÓN: NOMBRE PERSONALIZADO (ABREVIADO) ---
+                    // Formato deseado: 3P-LE | DD-DD NOV.
+                    
+                    // Función auxiliar para abreviar texto
+                    const abbreviate = (text) => {
+                        if (!text) return "XX";
+                        // Limpia caracteres especiales y espacios extra
+                        const clean = text.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, "").trim();
+                        // Palabras comunes a ignorar en las siglas
+                        const ignore = ["de", "del", "la", "el", "los", "las", "y", "en"];
+                        
+                        const words = clean.split(/\s+/).filter(w => !ignore.includes(w.toLowerCase()) && w.length > 0);
+                        
+                        if (words.length === 0) return "XX";
+                        
+                        if (words.length === 1) {
+                            // Si es una sola palabra, toma las primeras 3 letras (ej: Matemáticas -> MAT)
+                            return words[0].substring(0, 3).toUpperCase();
+                        } else {
+                            // Si son varias palabras, toma la inicial de cada una (ej: 3ro Primaria -> 3P)
+                            return words.map(w => w.charAt(0)).join('').toUpperCase();
+                        }
+                    };
+
+                    // 1. Obtener valores crudos
+                    const rawCurso = getValueOrEmpty('groupDetails');
+                    const rawMateria = getValueOrEmpty('subject');
+                    
+                    // 2. Generar abreviaturas
+                    const cursoAbrev = abbreviate(rawCurso);
+                    const materiaAbrev = abbreviate(rawMateria);
+                    
+                    // 3. Obtener Mes Actual Abreviado
+                    const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+                    const currentMonth = months[new Date().getMonth()];
+                    
+                    // 4. Construir nombre final
+                    const dynamicFileName = `${cursoAbrev}-${materiaAbrev} | DD-DD ${currentMonth}.docx`;
+                    // --- FIN DE MODIFICACIÓN ---
+
+                    saveAs(out, dynamicFileName);
                     showToast("¡Descarga iniciada!");
 
                 } catch (error) {
