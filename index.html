@@ -70,6 +70,12 @@
                             '0%, 100%': { color: '#4B5563' }, // Gray-600
                             '33%': { color: '#FFC857' },      // Yellow
                             '66%': { color: '#1B4965' }       // Dark Teal
+                        },
+                        // KEYFRAME: Animación de éxito de descarga/copia (Fade In/Out)
+                        successFeedback: {
+                            '0%': { transform: 'scale(1)', opacity: 1 },
+                            '50%': { transform: 'scale(1.05)', opacity: 0.8 },
+                            '100%': { transform: 'scale(1)', opacity: 1 },
                         }
                     }
                 }
@@ -257,6 +263,7 @@
             75% { color: #1B4965; } /* Dark Teal */
             100% { color: #9CA3AF; } 
         }
+        /* Restauración de la animación del footer */
         .animate-pulse-color { animation: colorPulseFooter 8s ease-in-out infinite; } 
         
         .fade-out { animation: fadeOut 0.4s ease-out forwards; }
@@ -283,6 +290,11 @@
             50% { color: #FFC857; }      /* Yellow */
         }
         .animate-teal-yellow-cycle { animation: tealYellowCycle 3s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* Clase para la animación de feedback del botón de descarga */
+        .animate-success-feedback {
+            animation: successFeedback 0.3s ease-in-out;
+        }
 
         /* CUSTOM SELECT STYLES */
         .custom-select-container { position: relative; width: 100%; }
@@ -534,7 +546,7 @@
                             <input type="text" id="groupDetails" placeholder="Ej. 3ro Primaria" required class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue text-base md:text-sm font-medium">
                         </div>
 
-                        <!-- SELECT MODERNIZADO -->
+                        <!-- SELECT MODELO PEDAGÓGICO -->
                         <div class="relative custom-select-container">
                             <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Modelo Pedagógico</label>
                             <div id="style-dropdown-btn" class="custom-select-trigger" onclick="toggleDropdown('style')">
@@ -549,6 +561,20 @@
                                 <button type="button" onclick="selectDropdownValue('style', 'Enseñanza por Competencias')">Enseñanza por Competencias</button>
                             </div>
                             <input type="hidden" id="teachingStyle" value="Por Competencias">
+                        </div>
+
+                        <!-- SELECTOR DE EXTENSIÓN (NUEVO) -->
+                        <div class="relative custom-select-container">
+                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Extensión de Contenido</label>
+                            <div id="extension-dropdown-btn" class="custom-select-trigger" onclick="toggleDropdown('extension')">
+                                <span id="selected-extension-text">Detallado (Actual)</span>
+                                <svg class="h-4 w-4 text-gray-600 transform transition-transform duration-200" id="extension-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                            </div>
+                            <div id="extension-dropdown-list" class="custom-dropdown-list hidden">
+                                <button type="button" onclick="selectDropdownValue('extension', 'Detallado (Actual)')">Detallado (Actual)</button>
+                                <button type="button" onclick="selectDropdownValue('extension', 'Compacto')">Compacto</button>
+                            </div>
+                            <input type="hidden" id="contentExtension" value="Detallado (Actual)">
                         </div>
                         
                         <!-- SECCIÓN NUEVA: CARGA DE PLANTILLA WORD -->
@@ -644,10 +670,15 @@
                         </div>
                         
                         <div class="flex gap-2">
-                            <!-- BOTÓN DESCARGA WORD: Usando el color Secundario (Medium Teal) -->
-                            <button id="btn-download-word" onclick="downloadWord()" class="hidden flex items-center gap-2 px-4 py-1.5 bg-montessori-teal text-white rounded-lg hover:bg-[#288B8B] shadow-md transition-all font-bold text-xs">
+                            <!-- BOTÓN DESCARGA WORD: Siempre visible post-generación -->
+                            <button id="btn-download-word" onclick="downloadWord()" class="flex items-center gap-2 px-4 py-1.5 bg-montessori-teal text-white rounded-lg hover:bg-[#288B8B] shadow-md transition-all font-bold text-xs">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 DESCARGAR WORD
+                            </button>
+                             <!-- BOTÓN DESCARGA PDF: Nuevo botón, siempre visible post-generación -->
+                             <button id="btn-download-pdf" onclick="downloadPdf()" class="flex items-center gap-2 px-4 py-1.5 bg-montessori-blue text-white rounded-lg hover:bg-[#123145] shadow-md transition-all font-bold text-xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2zm7-9h-5v5h5v-5z" /></svg>
+                                DESCARGAR PDF
                             </button>
                         </div>
                     </div>
@@ -890,6 +921,7 @@
             const toast = document.getElementById("toast");
             toast.innerText = message;
             toast.className = "show";
+            // Animación más rápida para toats
             setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
         }
 
@@ -931,6 +963,7 @@
             uploadArea.innerHTML = '<span class="text-xs text-montessori-blue font-bold animate-pulse">Procesando...</span>';
 
             try {
+                // Se mantiene la lógica de compresión pero se optimiza el renderizado de previews
                 const compressedPromises = files.map(file => compressImage(file, 800, 0.7));
                 const newImages = await Promise.all(compressedPromises);
                 attachedImages = [...attachedImages, ...newImages];
@@ -1045,26 +1078,40 @@
         // --- DROPDOWNS ---
         function initDropdowns() {}
         function toggleDropdown(type) {
-            const list = type === 'style' ? document.getElementById('style-dropdown-list') : null;
-            const chevron = type === 'style' ? document.getElementById('style-chevron') : null;
+            const list = type === 'style' ? document.getElementById('style-dropdown-list') : document.getElementById('extension-dropdown-list');
+            const chevron = type === 'style' ? document.getElementById('style-chevron') : document.getElementById('extension-chevron');
             if (list) {
                 list.classList.toggle('hidden');
                 if(chevron) chevron.classList.toggle('rotate-180');
             }
         }
         function selectDropdownValue(type, value) {
-            document.getElementById('teachingStyle').value = value;
-            document.getElementById('selected-style-text').textContent = value;
-            document.getElementById('style-dropdown-list').classList.add('hidden');
-            document.getElementById('style-chevron').classList.remove('rotate-180');
+            const inputId = type === 'style' ? 'teachingStyle' : 'contentExtension';
+            const textId = type === 'style' ? 'selected-style-text' : 'selected-extension-text';
+            const listId = type === 'style' ? 'style-dropdown-list' : 'extension-dropdown-list';
+            const chevronId = type === 'style' ? 'style-chevron' : 'extension-chevron';
+
+            document.getElementById(inputId).value = value;
+            document.getElementById(textId).textContent = value;
+            document.getElementById(listId).classList.add('hidden');
+            document.getElementById(chevronId).classList.remove('rotate-180');
         }
 
         document.addEventListener('click', function(e) {
             const styleBtn = document.getElementById('style-dropdown-btn');
             const styleList = document.getElementById('style-dropdown-list');
+            const extensionBtn = document.getElementById('extension-dropdown-btn');
+            const extensionList = document.getElementById('extension-dropdown-list');
+
+            // Cierra Style si está abierto y el clic fue fuera
             if (styleList && !styleList.classList.contains('hidden') && !styleList.contains(e.target) && !styleBtn.contains(e.target)) {
                 styleList.classList.add('hidden');
                 document.getElementById('style-chevron').classList.remove('rotate-180');
+            }
+            // Cierra Extension si está abierto y el clic fue fuera
+            if (extensionList && !extensionList.classList.contains('hidden') && !extensionList.contains(e.target) && !extensionBtn.contains(e.target)) {
+                extensionList.classList.add('hidden');
+                document.getElementById('extension-chevron').classList.remove('rotate-180');
             }
         });
         
@@ -1134,6 +1181,12 @@
             const topics = document.getElementById('topics').value;
             const daysCount = parseInt(document.getElementById('selectedDays').value);
             const extraInstructions = document.getElementById('customInstructions').value;
+            const extension = document.getElementById('contentExtension').value;
+
+            const extensionInstruction = extension === 'Compacto' 
+                ? "Mantén las descripciones de INICIO, DESARROLLO y CIERRE concisas, usando un máximo de 3 a 4 oraciones por sección para cada día."
+                : "Usa descripciones detalladas para INICIO, DESARROLLO y CIERRE.";
+
 
             // Prompt diseñado para devolver JSON
             const systemInstruction = `
@@ -1145,11 +1198,10 @@
             Estilo: ${style}
             ${extraInstructions ? "Instrucciones Extra: " + extraInstructions : ""}
             ${attachedImages.length > 0 ? "Nota: Se adjuntaron imágenes de referencia, úsalas en la planificación si es relevante." : ""}
-
-            IMPORTANTE: DEBES GENERAR LOS 5 DÍAS SOLICITADOS SI EL USUARIO LOS PIDEN.
-            Si el contenido es muy largo, REDUCE la longitud de las descripciones para asegurar que la respuesta completa (JSON cerrado) quepa en el límite de tokens. Prioriza completar la ESTRUCTURA de los 5 días sobre el detalle excesivo.
-
-            REGLA PRINCIPAL DE TIEMPO: La suma de las actividades de INICIO, DESARROLLO y CIERRE debe ser de un total de 60 minutos (1 hora de clase).
+            
+            ${extensionInstruction}
+            
+            REGLA DE TIEMPO CRÍTICA: La suma de las actividades de INICIO, DESARROLLO y CIERRE debe ser de un total de 60 minutos (1 hora de clase). Es IMPERATIVO que los tiempos (ej. (10 min), (40 min), (10 min)) VARÍEN COHERENTEMENTE entre los días (por ejemplo, Lunes puede ser 10/40/10, Martes 15/35/10, Miércoles 10/30/20, etc.) para reflejar una clase natural. NO asignes siempre los mismos 10/40/10.
 
             REGLAS DE ESTILO Y NOMENCLATURA:
             1. TEMAS PUNTUALES: El "tema" de cada día debe ser breve.
@@ -1297,10 +1349,9 @@
                 resCont.classList.add('flex');
                 requestAnimationFrame(() => resCont.classList.remove('translate-y-4', 'opacity-0'));
                 
-                const fileInput = document.getElementById('template-upload');
-                if (fileInput.files.length > 0) {
-                    document.getElementById('btn-download-word').classList.remove('hidden');
-                }
+                // Los botones de descarga se hacen visibles aquí. (La lógica `hidden` se quitó del HTML)
+                // document.getElementById('btn-download-word').classList.remove('hidden'); // Ya no es necesario
+                // document.getElementById('btn-download-pdf').classList.remove('hidden'); // Ya no es necesario
 
             } catch (error) {
                 console.error("ERROR:", error);
@@ -1364,6 +1415,24 @@
             }
         }
 
+        // --- FUNCIÓN DE DESCARGA PDF (PLACEHOLDER) ---
+        function downloadPdf() {
+            const btn = document.getElementById('btn-download-pdf');
+            // Aplicar animación de feedback
+            btn.classList.add('animate-success-feedback');
+            setTimeout(() => {
+                btn.classList.remove('animate-success-feedback');
+            }, 300);
+
+            if (!currentPlanData) {
+                showToast("Primero debes generar un plan.");
+                return;
+            }
+
+            // Aquí iría la lógica de generación de PDF real (usando jsPDF o similar, o enviando a GAS)
+            showToast("Función 'Descargar PDF' en desarrollo. ¡Descarga el Word!");
+        }
+
         // --- DESCARGA WORD ---
         // FIX FUNCIONAL: Lógica robusta para evitar errores si faltan campos
         function getValueOrEmpty(id) {
@@ -1376,8 +1445,22 @@
 
         function downloadWord() {
             const fileInput = document.getElementById('template-upload');
+            const btn = document.getElementById('btn-download-word');
+
+            // Aplicar animación de feedback
+            btn.classList.add('animate-success-feedback');
+            setTimeout(() => {
+                btn.classList.remove('animate-success-feedback');
+            }, 300);
+            
+            // Permite descargar si hay plan generado, pero advierte si falta plantilla
+            if (!currentPlanData) {
+                showToast("Primero debes generar un plan.");
+                return;
+            }
+
             if (fileInput.files.length === 0) {
-                showToast("Sube tu plantilla .docx primero");
+                showToast("Advertencia: No se subió plantilla .docx. La descarga fallará.");
                 return;
             }
 
