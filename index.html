@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- FAVICON -->
+    <!-- FAVICON (Actualizado con el nuevo diseño elaborado de Planificador) -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3C!-- Document background (White) --%3E%3Crect x=%2215%22 y=%2215%22 width=%2270%22 height=%2270%22 rx=%228%22 fill=%22%23FFFFFF%22 stroke=%22%231B4965%22 stroke-width=%223%22/%3E%3C!-- Corner fold for depth --%3E%3Cpath d=%22M85 15 L85 30 L70 15 Z%22 fill=%22%23E0EFFF%22/%3E %3C!-- Planner lines (Medium Teal) --%3E%3Crect x=%2225%22 y=%2230%22 width=%2250%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3Crect x=%2225%22 y=%2245%22 width=%2250%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3Crect x=%2225%22 y=%2260%22 width=%2230%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3C!-- Pencil (Dark Teal) --%3E%3Cg transform=%22rotate(45 75 80)%22%3E%3Crect x=%2265%22 y=%2270%22 width=%2230%22 height=%228%22 rx=%222%22 fill=%22%231B4965%22/%3E%3C!-- Pencil tip --%3E%3Cpolygon points=%2295,74 90,70 90,78%22 fill=%22%234B5563%22/%3E %3C!-- Eraser (Yellow Accent) --%3E%3Crect x=%2263%22 y=%2270%22 width=%224%22 height=%228%22 fill=%22%23FFC857%22/%3E%3C/g%3E%3C/svg%3E">
 
     <!-- Fuentes -->
@@ -52,6 +52,7 @@
                     animation: {
                         'diagonal-shift': 'diagonalShift 3s ease-in-out infinite alternate',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        // Animación de color del preloader - Ahora entre Dark Teal y Yellow
                         'teal-yellow-cycle': 'tealYellowCycle 3s infinite cubic-bezier(0.4, 0, 0.2, 1)', 
                     },
                     keyframes: {
@@ -59,11 +60,12 @@
                             '0%': { 'background-position': '0% 0%' },
                             '100%': { 'background-position': '100% 100%' },
                         },
+                        // KEYFRAME: Animación de color del preloader (Dark Teal <-> Yellow)
                         tealYellowCycle: {
                             '0%, 100%': { color: '#1B4965' }, // Dark Teal
                             '50%': { color: '#FFC857' }       // Yellow
                         },
-                        // KEYFRAME: Animación de color del footer
+                        // KEYFRAME: Animación de color del footer (Gray -> Yellow -> Dark Teal)
                         colorPulseFooter: {
                             '0%, 100%': { color: '#4B5563' }, // Gray-600
                             '33%': { color: '#FFC857' },      // Yellow
@@ -253,6 +255,15 @@
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
 
         /* --- ANIMACIONES GENERALES --- */
+        /* CAMBIO: Animación de color del placeholder - NO usa rojo/azul directamente, usa Yellow/Dark Teal */
+        @keyframes colorPulse { 
+            0% { color: #9CA3AF; } 
+            25% { color: #FFC857; } /* Yellow */
+            50% { color: #9CA3AF; } 
+            75% { color: #1B4965; } /* Dark Teal */
+            100% { color: #9CA3AF; } 
+        }
+        .animate-pulse-color { animation: colorPulseFooter 8s ease-in-out infinite; } 
         
         .fade-out { animation: fadeOut 0.4s ease-out forwards; }
         @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.99); pointer-events: none; } }
@@ -278,15 +289,6 @@
             50% { color: #FFC857; }      /* Yellow */
         }
         .animate-teal-yellow-cycle { animation: tealYellowCycle 3s infinite cubic-bezier(0.4, 0, 0.2, 1); }
-
-        /* KEYFRAME: Animación de color del footer */
-        @keyframes colorPulseFooter {
-            0%, 100% { color: #4B5563; } /* Gray-600 */
-            33% { color: #FFC857; }      /* Yellow */
-            66% { color: #1B4965; }      /* Dark Teal */
-        }
-        /* Restauración de la animación del footer */
-        .animate-pulse-color { animation: colorPulseFooter 8s ease-in-out infinite; } 
 
         /* Clase para la animación de feedback del botón de descarga */
         .animate-success-feedback {
@@ -543,7 +545,7 @@
                             <input type="text" id="groupDetails" placeholder="Ej. 3ro Primaria" required class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue text-base md:text-sm font-medium">
                         </div>
 
-                        <!-- SELECT MODELO PEDAGÓGICO -->
+                        <!-- SELECT MODERNIZADO -->
                         <div class="relative custom-select-container">
                             <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Modelo Pedagógico</label>
                             <div id="style-dropdown-btn" class="custom-select-trigger" onclick="toggleDropdown('style')">
@@ -558,20 +560,6 @@
                                 <button type="button" onclick="selectDropdownValue('style', 'Enseñanza por Competencias')">Enseñanza por Competencias</button>
                             </div>
                             <input type="hidden" id="teachingStyle" value="Por Competencias">
-                        </div>
-
-                        <!-- SELECTOR DE EXTENSIÓN (NUEVO) -->
-                        <div class="relative custom-select-container">
-                            <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Extensión de Contenido</label>
-                            <div id="extension-dropdown-btn" class="custom-select-trigger" onclick="toggleDropdown('extension')">
-                                <span id="selected-extension-text">Detallado (Actual)</span>
-                                <svg class="h-4 w-4 text-gray-600 transform transition-transform duration-200" id="extension-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
-                            </div>
-                            <div id="extension-dropdown-list" class="custom-dropdown-list hidden">
-                                <button type="button" onclick="selectDropdownValue('extension', 'Detallado (Actual)')">Detallado (Actual)</button>
-                                <button type="button" onclick="selectDropdownValue('extension', 'Compacto')">Compacto</button>
-                            </div>
-                            <input type="hidden" id="contentExtension" value="Detallado (Actual)">
                         </div>
                         
                         <!-- SECCIÓN NUEVA: CARGA DE PLANTILLA WORD -->
@@ -657,21 +645,20 @@
                 <!-- Contenedor de Resultados con Editor -->
                 <div id="result-content" class="hidden h-full flex-col bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 relative z-10 transition-all duration-500 transform translate-y-4 opacity-0 flex-1">
                     
-                    <!-- BARRA SUPERIOR - MODIFICADA PARA SER MÁS COMPACTA -->
-                    <div class="flex justify-between items-center px-3 py-1 bg-gray-50 border-b border-gray-200 flex-shrink-0 h-12">
-                        <div class="flex items-center gap-2 flex-shrink-0">
-                             <div class="flex flex-col leading-tight">
-                                <span class="text-xs font-bold text-gray-700">Editor de Contenido</span>
-                                <span class="text-[9px] text-gray-500">Los cambios se guardarán al descargar</span>
+                    <!-- BARRA SUPERIOR -->
+                    <div class="flex justify-between items-center px-4 py-2 bg-gray-50 border-b border-gray-200 flex-shrink-0 h-14">
+                        <div class="flex items-center gap-2">
+                             <div class="flex flex-col">
+                                <span class="text-sm font-bold text-gray-700">Editor de Contenido</span>
+                                <span class="text-[10px] text-gray-500">Los cambios se guardarán al descargar</span>
                              </div>
                         </div>
                         
-                        <!-- Botones de descarga ajustados a tamaño compacto -->
-                        <div class="flex gap-1.5 flex-shrink-0">
-                            <!-- BOTÓN DESCARGA WORD: Siempre visible post-generación -->
-                            <button id="btn-download-word" onclick="downloadWord()" class="flex items-center gap-1 px-3 py-1 bg-montessori-teal text-white rounded-lg hover:bg-[#288B8B] shadow-md transition-all font-bold text-[10px]">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                WORD
+                        <div class="flex gap-2">
+                            <!-- BOTÓN DESCARGA WORD: Usando el color Secundario (Medium Teal) -->
+                            <button id="btn-download-word" onclick="downloadWord()" class="hidden flex items-center gap-2 px-4 py-1.5 bg-montessori-teal text-white rounded-lg hover:bg-[#288B8B] shadow-md transition-all font-bold text-xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                DESCARGAR WORD
                             </button>
                         </div>
                     </div>
@@ -914,7 +901,6 @@
             const toast = document.getElementById("toast");
             toast.innerText = message;
             toast.className = "show";
-            // Animación más rápida para toats
             setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
         }
 
@@ -956,7 +942,6 @@
             uploadArea.innerHTML = '<span class="text-xs text-montessori-blue font-bold animate-pulse">Procesando...</span>';
 
             try {
-                // Se mantiene la lógica de compresión pero se optimiza el renderizado de previews
                 const compressedPromises = files.map(file => compressImage(file, 800, 0.7));
                 const newImages = await Promise.all(compressedPromises);
                 attachedImages = [...attachedImages, ...newImages];
@@ -1071,40 +1056,26 @@
         // --- DROPDOWNS ---
         function initDropdowns() {}
         function toggleDropdown(type) {
-            const list = type === 'style' ? document.getElementById('style-dropdown-list') : document.getElementById('extension-dropdown-list');
-            const chevron = type === 'style' ? document.getElementById('style-chevron') : document.getElementById('extension-chevron');
+            const list = type === 'style' ? document.getElementById('style-dropdown-list') : null;
+            const chevron = type === 'style' ? document.getElementById('style-chevron') : null;
             if (list) {
                 list.classList.toggle('hidden');
                 if(chevron) chevron.classList.toggle('rotate-180');
             }
         }
         function selectDropdownValue(type, value) {
-            const inputId = type === 'style' ? 'teachingStyle' : 'contentExtension';
-            const textId = type === 'style' ? 'selected-style-text' : 'selected-extension-text';
-            const listId = type === 'style' ? 'style-dropdown-list' : 'extension-dropdown-list';
-            const chevronId = type === 'style' ? 'style-chevron' : 'extension-chevron';
-
-            document.getElementById(inputId).value = value;
-            document.getElementById(textId).textContent = value;
-            document.getElementById(listId).classList.add('hidden');
-            document.getElementById(chevronId).classList.remove('rotate-180');
+            document.getElementById('teachingStyle').value = value;
+            document.getElementById('selected-style-text').textContent = value;
+            document.getElementById('style-dropdown-list').classList.add('hidden');
+            document.getElementById('style-chevron').classList.remove('rotate-180');
         }
 
         document.addEventListener('click', function(e) {
             const styleBtn = document.getElementById('style-dropdown-btn');
             const styleList = document.getElementById('style-dropdown-list');
-            const extensionBtn = document.getElementById('extension-dropdown-btn');
-            const extensionList = document.getElementById('extension-dropdown-list');
-
-            // Cierra Style si está abierto y el clic fue fuera
             if (styleList && !styleList.classList.contains('hidden') && !styleList.contains(e.target) && !styleBtn.contains(e.target)) {
                 styleList.classList.add('hidden');
                 document.getElementById('style-chevron').classList.remove('rotate-180');
-            }
-            // Cierra Extension si está abierto y el clic fue fuera
-            if (extensionList && !extensionList.classList.contains('hidden') && !extensionList.contains(e.target) && !extensionBtn.contains(e.target)) {
-                extensionList.classList.add('hidden');
-                document.getElementById('extension-chevron').classList.remove('rotate-180');
             }
         });
         
@@ -1174,12 +1145,6 @@
             const topics = document.getElementById('topics').value;
             const daysCount = parseInt(document.getElementById('selectedDays').value);
             const extraInstructions = document.getElementById('customInstructions').value;
-            const extension = document.getElementById('contentExtension').value;
-
-            // Lógica de extensión optimizada para evitar cortes en modo detallado
-            const extensionInstruction = extension === 'Compacto' 
-                ? "MODO COMPACTO: Sé muy conciso. Usa viñetas (-). Máximo 2 oraciones por sección. Enfócate en la acción directa."
-                : "MODO DETALLADO (OPTIMIZADO): Genera una planificación completa y rica pedagógicamente, pero mantén una longitud CONTROLADA (aprox 4-6 oraciones por sección) para asegurar que el JSON de los 5 días quepa perfectamente en la respuesta sin cortarse. Es vital que la estructura JSON esté completa y cerrada.";
 
             // Prompt diseñado para devolver JSON
             const systemInstruction = `
@@ -1191,15 +1156,21 @@
             Estilo: ${style}
             ${extraInstructions ? "Instrucciones Extra: " + extraInstructions : ""}
             ${attachedImages.length > 0 ? "Nota: Se adjuntaron imágenes de referencia, úsalas en la planificación si es relevante." : ""}
-            
-            ${extensionInstruction}
-            
-            REGLA DE TIEMPO CRÍTICA: La suma de las actividades de INICIO, DESARROLLO y CIERRE debe ser de un total de 60 minutos. VARÍA los tiempos entre días para naturalidad.
 
-            REGLAS DE ESTILO OBLIGATORIAS:
-            1. **CERO ETIQUETAS:** NO uses frases como 'Pregunta generadora:', 'Actividad:', 'Inicio:'. Empieza DIRECTO con el tiempo y la acción. Ej: '(10 min) Lluvia de ideas...'.
-            2. FORMATO JSON PURO: Responde SOLO con el JSON.
-            3. NO te quedes sin espacio. Si ves que el plan es largo, resume levemente para asegurar que cierras el JSON correctamente.
+            IMPORTANTE: DEBES GENERAR LOS 5 DÍAS SOLICITADOS SI EL USUARIO LOS PIDEN.
+            Si el contenido es muy largo, REDUCE la longitud de las descripciones para asegurar que la respuesta completa (JSON cerrado) quepa en el límite de tokens. Prioriza completar la ESTRUCTURA de los 5 días sobre el detalle excesivo.
+
+            REGLA PRINCIPAL DE TIEMPO: La suma de las actividades de INICIO, DESARROLLO y CIERRE debe ser de un total de 60 minutos (1 hora de clase).
+
+            REGLAS DE ESTILO Y NOMENCLATURA:
+            1. TEMAS PUNTUALES: El "tema" de cada día debe ser breve.
+            2. TIEMPO AL INICIO: En cada actividad, pon el tiempo PRIMERO entre paréntesis. Ejemplo: "(10 min) Lluvia de ideas...".
+            3. TEXTO DIRECTO: Describe las actividades de forma fluida.
+            4. SIN TÍTULOS DE FANTASÍA.
+            5. PREGUNTAS DIRECTAS.
+            6. FORMATO JSON SEGURO: Dentro de los textos, usa comillas simples (') para evitar romper el JSON.
+
+            IMPORTANTE: RESPONDE ÚNICAMENTE CON UN OBJETO JSON VÁLIDO.
             
             Estructura requerida:
             {
@@ -1211,6 +1182,8 @@
               "jueves": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." },
               "viernes": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." }
             }
+            
+            Si se piden menos de 5 días, deja las claves de los días no usados como cadenas vacías.
             `;
 
             const userPrompt = `Generar plan de ${daysCount} días para ${subject}.`;
@@ -1335,9 +1308,10 @@
                 resCont.classList.add('flex');
                 requestAnimationFrame(() => resCont.classList.remove('translate-y-4', 'opacity-0'));
                 
-                // Los botones de descarga se hacen visibles aquí. (La lógica `hidden` se quitó del HTML)
-                // document.getElementById('btn-download-word').classList.remove('hidden'); // Ya no es necesario
-                // document.getElementById('btn-download-pdf').classList.remove('hidden'); // Ya no es necesario
+                const fileInput = document.getElementById('template-upload');
+                if (fileInput.files.length > 0) {
+                    document.getElementById('btn-download-word').classList.remove('hidden');
+                }
 
             } catch (error) {
                 console.error("ERROR:", error);
@@ -1415,22 +1389,17 @@
             const fileInput = document.getElementById('template-upload');
             const btn = document.getElementById('btn-download-word');
 
+            if (fileInput.files.length === 0) {
+                showToast("Sube tu plantilla .docx primero");
+                return;
+            }
+
             // Aplicar animación de feedback
             btn.classList.add('animate-success-feedback');
             setTimeout(() => {
                 btn.classList.remove('animate-success-feedback');
             }, 300);
-            
-            // Permite descargar si hay plan generado, pero advierte si falta plantilla
-            if (!currentPlanData) {
-                showToast("Primero debes generar un plan.");
-                return;
-            }
 
-            if (fileInput.files.length === 0) {
-                showToast("Advertencia: No se subió plantilla .docx. La descarga fallará.");
-                return;
-            }
 
             // La data es generada por la herramienta
             const safePlanData = currentPlanData || {};
