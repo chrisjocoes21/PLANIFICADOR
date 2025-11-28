@@ -178,7 +178,7 @@
         .plan-card:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         
         .day-header {
-            color: #e74c3c; /* Color de peligro */
+            color: #1B4965; /* CAMBIO: Usar Dark Teal en lugar de color de peligro */
             font-family: 'Montserrat', sans-serif;
             font-weight: 800;
             text-transform: uppercase;
@@ -619,10 +619,12 @@
                     <div class="flex flex-col items-center">
                         <div class="relative w-20 h-20 mb-6">
                             <div class="absolute inset-0 rounded-full border-4 border-gray-100"></div>
-                            <div class="absolute inset-0 rounded-full border-4 border-montessori-red border-t-transparent animate-spin"></div>
+                            <!-- CAMBIO 1: Sustitución de border-montessori-red por Medium Teal -->
+                            <div class="absolute inset-0 rounded-full border-4 border-montessori-teal border-t-transparent animate-spin"></div>
                             <div class="absolute inset-3 rounded-full border-4 border-montessori-blue border-t-transparent animate-spin" style="animation-direction: reverse; animation-duration: 2s;"></div>
                         </div>
                         <div class="text-center space-y-2">
+                            <!-- CAMBIO 2: Sustitución de text-montessori-blue por Dark Teal -->
                             <h3 class="text-lg font-bold text-montessori-blue font-montserrat animate-pulse">Analizando Recursos...</h3>
                             <p class="text-xs text-gray-500 font-medium">Creando actividades personalizadas...</p>
                         </div>
@@ -1408,7 +1410,7 @@
                 // Jueves
                 tema_jueves: getValueOrEmpty('topic_jueves'),
                 inicio_jueves: getValueOrEmpty('inicio_jueves'),
-                desarrollo_jueves: getValueAORomana('desarrollo_jueves'),
+                desarrollo_jueves: getValueOrEmpty('desarrollo_jueves'),
                 cierre_jueves: getValueOrEmpty('cierre_jueves'),
                 tarea_jueves: getValueOrEmpty('tarea_jueves'),
                 // Viernes
