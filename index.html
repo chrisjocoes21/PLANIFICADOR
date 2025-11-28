@@ -65,12 +65,6 @@
                             '0%, 100%': { color: '#1B4965' }, // Dark Teal
                             '50%': { color: '#FFC857' }       // Yellow
                         },
-                        // KEYFRAME: Animación de color del footer (Gray -> Yellow -> Dark Teal)
-                        colorPulseFooter: {
-                            '0%, 100%': { color: '#4B5563' }, // Gray-600
-                            '33%': { color: '#FFC857' },      // Yellow
-                            '66%': { color: '#1B4965' }       // Dark Teal
-                        },
                         // KEYFRAME: Animación de éxito de descarga/copia (Fade In/Out)
                         successFeedback: {
                             '0%': { transform: 'scale(1)', opacity: 1 },
@@ -255,15 +249,19 @@
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
 
         /* --- ANIMACIONES GENERALES --- */
-        /* CAMBIO: Animación de color del placeholder - NO usa rojo/azul directamente, usa Yellow/Dark Teal */
-        @keyframes colorPulse { 
-            0% { color: #9CA3AF; } 
-            25% { color: #FFC857; } /* Yellow */
-            50% { color: #9CA3AF; } 
-            75% { color: #1B4965; } /* Dark Teal */
-            100% { color: #9CA3AF; } 
+        
+        /* CORRECCIÓN ANIMACIÓN FOOTER */
+        @keyframes colorPulseFooter {
+            0% { color: #4B5563; } /* Gray-600 */
+            33% { color: #FFC857; } /* Yellow */
+            66% { color: #1B4965; } /* Dark Teal */
+            100% { color: #4B5563; } /* Gray-600 */
         }
-        .animate-pulse-color { animation: colorPulseFooter 8s ease-in-out infinite; } 
+        
+        /* Aplicamos la animación explícitamente */
+        .animate-pulse-color { 
+            animation: colorPulseFooter 4s ease-in-out infinite !important; 
+        }
         
         .fade-out { animation: fadeOut 0.4s ease-out forwards; }
         @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.99); pointer-events: none; } }
@@ -549,7 +547,7 @@
                         <div class="relative custom-select-container">
                             <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Modelo Pedagógico</label>
                             <div id="style-dropdown-btn" class="custom-select-trigger" onclick="toggleDropdown('style')">
-                                <span id="selected-style-text">Por Competencias</span>
+                                <span id="selected-style-text" class="text-gray-500 font-normal">Seleccione Modelo...</span>
                                 <svg class="h-4 w-4 text-gray-600 transform transition-transform duration-200" id="style-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                             </div>
                             <div id="style-dropdown-list" class="custom-dropdown-list hidden">
@@ -559,7 +557,8 @@
                                 <button type="button" onclick="selectDropdownValue('style', 'Adecuación Curricular')">Adecuación Curricular</button>
                                 <button type="button" onclick="selectDropdownValue('style', 'Enseñanza por Competencias')">Enseñanza por Competencias</button>
                             </div>
-                            <input type="hidden" id="teachingStyle" value="Por Competencias">
+                            <!-- CAMBIO: Valor inicial vacío -->
+                            <input type="hidden" id="teachingStyle" value="">
                         </div>
                         
                         <!-- SECCIÓN NUEVA: CARGA DE PLANTILLA WORD -->
@@ -1065,7 +1064,12 @@
         }
         function selectDropdownValue(type, value) {
             document.getElementById('teachingStyle').value = value;
-            document.getElementById('selected-style-text').textContent = value;
+            const textSpan = document.getElementById('selected-style-text');
+            textSpan.textContent = value;
+            // FIX: Cambiar estilo al seleccionar
+            textSpan.classList.remove('text-gray-500', 'font-normal');
+            textSpan.classList.add('text-gray-900', 'font-medium');
+            
             document.getElementById('style-dropdown-list').classList.add('hidden');
             document.getElementById('style-chevron').classList.remove('rotate-180');
         }
@@ -1141,7 +1145,10 @@
 
             const subject = document.getElementById('subject').value;
             const groupDetails = document.getElementById('groupDetails').value;
-            const style = document.getElementById('teachingStyle').value || "Por Competencias";
+            // FIX: Permitir que el estilo sea por defecto si está vacío, pero visualmente obliga a seleccionar
+            let style = document.getElementById('teachingStyle').value;
+            if(!style) style = "Por Competencias"; // Fallback interno
+            
             const topics = document.getElementById('topics').value;
             const daysCount = parseInt(document.getElementById('selectedDays').value);
             const extraInstructions = document.getElementById('customInstructions').value;
