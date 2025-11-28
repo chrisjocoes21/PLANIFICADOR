@@ -1349,10 +1349,8 @@
                 
                 document.getElementById('btn-modify').classList.remove('hidden');
                 
-                const fileInput = document.getElementById('template-upload');
-                if (fileInput.files.length > 0) {
-                    document.getElementById('btn-download-word').classList.remove('hidden');
-                }
+                // CORRECCION: Siempre mostrar el botón al generar resultados
+                document.getElementById('btn-download-word').classList.remove('hidden');
 
             } catch (error) {
                 console.error("ERROR:", error);
