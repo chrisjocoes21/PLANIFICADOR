@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- FAVICON (Actualizado con el nuevo diseño elaborado de Planificador) -->
+    <!-- FAVICON -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3C!-- Document background (White) --%3E%3Crect x=%2215%22 y=%2215%22 width=%2270%22 height=%2270%22 rx=%228%22 fill=%22%23FFFFFF%22 stroke=%22%231B4965%22 stroke-width=%223%22/%3E%3C!-- Corner fold for depth --%3E%3Cpath d=%22M85 15 L85 30 L70 15 Z%22 fill=%22%23E0EFFF%22/%3E %3C!-- Planner lines (Medium Teal) --%3E%3Crect x=%2225%22 y=%2230%22 width=%2250%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3Crect x=%2225%22 y=%2245%22 width=%2250%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3Crect x=%2225%22 y=%2260%22 width=%2230%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3C!-- Pencil (Dark Teal) --%3E%3Cg transform=%22rotate(45 75 80)%22%3E%3Crect x=%2265%22 y=%2270%22 width=%2230%22 height=%228%22 rx=%222%22 fill=%22%231B4965%22/%3E%3C!-- Pencil tip --%3E%3Cpolygon points=%2295,74 90,70 90,78%22 fill=%22%234B5563%22/%3E %3C!-- Eraser (Yellow Accent) --%3E%3Crect x=%2263%22 y=%2270%22 width=%224%22 height=%228%22 fill=%22%23FFC857%22/%3E%3C/g%3E%3C/svg%3E">
 
     <!-- Fuentes -->
@@ -52,7 +52,6 @@
                     animation: {
                         'diagonal-shift': 'diagonalShift 3s ease-in-out infinite alternate',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        // Animación de color del preloader - Ahora entre Dark Teal y Yellow
                         'teal-yellow-cycle': 'tealYellowCycle 3s infinite cubic-bezier(0.4, 0, 0.2, 1)', 
                     },
                     keyframes: {
@@ -60,16 +59,9 @@
                             '0%': { 'background-position': '0% 0%' },
                             '100%': { 'background-position': '100% 100%' },
                         },
-                        // KEYFRAME: Animación de color del preloader (Dark Teal <-> Yellow)
                         tealYellowCycle: {
                             '0%, 100%': { color: '#1B4965' }, // Dark Teal
                             '50%': { color: '#FFC857' }       // Yellow
-                        },
-                        // KEYFRAME: Animación de color del footer (Gray -> Yellow -> Dark Teal)
-                        colorPulseFooter: {
-                            '0%, 100%': { color: '#4B5563' }, // Gray-600
-                            '33%': { color: '#FFC857' },      // Yellow
-                            '66%': { color: '#1B4965' }       // Dark Teal
                         },
                         // KEYFRAME: Animación de éxito de descarga/copia (Fade In/Out)
                         successFeedback: {
@@ -255,16 +247,6 @@
         #toast.show { visibility: visible; opacity: 1; bottom: 50px; }
 
         /* --- ANIMACIONES GENERALES --- */
-        /* CAMBIO: Animación de color del placeholder - NO usa rojo/azul directamente, usa Yellow/Dark Teal */
-        @keyframes colorPulse { 
-            0% { color: #9CA3AF; } 
-            25% { color: #FFC857; } /* Yellow */
-            50% { color: #9CA3AF; } 
-            75% { color: #1B4965; } /* Dark Teal */
-            100% { color: #9CA3AF; } 
-        }
-        /* Restauración de la animación del footer */
-        .animate-pulse-color { animation: colorPulseFooter 8s ease-in-out infinite; } 
         
         .fade-out { animation: fadeOut 0.4s ease-out forwards; }
         @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.99); pointer-events: none; } }
@@ -290,6 +272,15 @@
             50% { color: #FFC857; }      /* Yellow */
         }
         .animate-teal-yellow-cycle { animation: tealYellowCycle 3s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* KEYFRAME: Animación de color del footer (MOVIDO A CSS ESTÁNDAR PARA GARANTIZAR FUNCIONAMIENTO) */
+        @keyframes colorPulseFooter {
+            0%, 100% { color: #4B5563; } /* Gray-600 */
+            33% { color: #FFC857; }      /* Yellow */
+            66% { color: #1B4965; }      /* Dark Teal */
+        }
+        /* Restauración de la animación del footer */
+        .animate-pulse-color { animation: colorPulseFooter 8s ease-in-out infinite; } 
 
         /* Clase para la animación de feedback del botón de descarga */
         .animate-success-feedback {
@@ -660,25 +651,21 @@
                 <!-- Contenedor de Resultados con Editor -->
                 <div id="result-content" class="hidden h-full flex-col bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 relative z-10 transition-all duration-500 transform translate-y-4 opacity-0 flex-1">
                     
-                    <!-- BARRA SUPERIOR -->
-                    <div class="flex justify-between items-center px-4 py-2 bg-gray-50 border-b border-gray-200 flex-shrink-0 h-14">
-                        <div class="flex items-center gap-2">
-                             <div class="flex flex-col">
-                                <span class="text-sm font-bold text-gray-700">Editor de Contenido</span>
-                                <span class="text-[10px] text-gray-500">Los cambios se guardarán al descargar</span>
+                    <!-- BARRA SUPERIOR - MODIFICADA PARA SER MÁS COMPACTA -->
+                    <div class="flex justify-between items-center px-3 py-1 bg-gray-50 border-b border-gray-200 flex-shrink-0 h-12">
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                             <div class="flex flex-col leading-tight">
+                                <span class="text-xs font-bold text-gray-700">Editor de Contenido</span>
+                                <span class="text-[9px] text-gray-500">Los cambios se guardarán al descargar</span>
                              </div>
                         </div>
                         
-                        <div class="flex gap-2">
+                        <!-- Botones de descarga ajustados a tamaño compacto -->
+                        <div class="flex gap-1.5 flex-shrink-0">
                             <!-- BOTÓN DESCARGA WORD: Siempre visible post-generación -->
-                            <button id="btn-download-word" onclick="downloadWord()" class="flex items-center gap-2 px-4 py-1.5 bg-montessori-teal text-white rounded-lg hover:bg-[#288B8B] shadow-md transition-all font-bold text-xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                DESCARGAR WORD
-                            </button>
-                             <!-- BOTÓN DESCARGA PDF: Nuevo botón, siempre visible post-generación -->
-                             <button id="btn-download-pdf" onclick="downloadPdf()" class="flex items-center gap-2 px-4 py-1.5 bg-montessori-blue text-white rounded-lg hover:bg-[#123145] shadow-md transition-all font-bold text-xs">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2zm7-9h-5v5h5v-5z" /></svg>
-                                DESCARGAR PDF
+                            <button id="btn-download-word" onclick="downloadWord()" class="flex items-center gap-1 px-3 py-1 bg-montessori-teal text-white rounded-lg hover:bg-[#288B8B] shadow-md transition-all font-bold text-[10px]">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                WORD
                             </button>
                         </div>
                     </div>
@@ -1183,8 +1170,9 @@
             const extraInstructions = document.getElementById('customInstructions').value;
             const extension = document.getElementById('contentExtension').value;
 
+            // FIX: PROMPT DE MODO COMPACTO MUCHO MÁS ESTRICTO
             const extensionInstruction = extension === 'Compacto' 
-                ? "Mantén las descripciones de INICIO, DESARROLLO y CIERRE concisas, usando un máximo de 3 a 4 oraciones por sección para cada día."
+                ? "MODO COMPACTO: Sé extremadamente breve. Usa listas con viñetas (-). Máximo 15-20 palabras por sección (Inicio, Desarrollo, Cierre). Solo palabras clave y acciones directas. Evita explicaciones largas."
                 : "Usa descripciones detalladas para INICIO, DESARROLLO y CIERRE.";
 
 
@@ -1413,24 +1401,6 @@
                 `;
                 container.appendChild(card);
             }
-        }
-
-        // --- FUNCIÓN DE DESCARGA PDF (PLACEHOLDER) ---
-        function downloadPdf() {
-            const btn = document.getElementById('btn-download-pdf');
-            // Aplicar animación de feedback
-            btn.classList.add('animate-success-feedback');
-            setTimeout(() => {
-                btn.classList.remove('animate-success-feedback');
-            }, 300);
-
-            if (!currentPlanData) {
-                showToast("Primero debes generar un plan.");
-                return;
-            }
-
-            // Aquí iría la lógica de generación de PDF real (usando jsPDF o similar, o enviando a GAS)
-            showToast("Función 'Descargar PDF' en desarrollo. ¡Descarga el Word!");
         }
 
         // --- DESCARGA WORD ---
