@@ -63,7 +63,7 @@
                             '0%, 100%': { color: '#1B4965' }, // Dark Teal
                             '50%': { color: '#FFC857' }       // Yellow
                         },
-                        // KEYFRAME: Animación de color del footer (MOVIDO A CSS ESTÁNDAR PARA GARANTIZAR FUNCIONAMIENTO)
+                        // KEYFRAME: Animación de color del footer
                         colorPulseFooter: {
                             '0%, 100%': { color: '#4B5563' }, // Gray-600
                             '33%': { color: '#FFC857' },      // Yellow
@@ -279,7 +279,7 @@
         }
         .animate-teal-yellow-cycle { animation: tealYellowCycle 3s infinite cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* KEYFRAME: Animación de color del footer (MOVIDO A CSS ESTÁNDAR PARA GARANTIZAR FUNCIONAMIENTO) */
+        /* KEYFRAME: Animación de color del footer */
         @keyframes colorPulseFooter {
             0%, 100% { color: #4B5563; } /* Gray-600 */
             33% { color: #FFC857; }      /* Yellow */
@@ -1176,11 +1176,10 @@
             const extraInstructions = document.getElementById('customInstructions').value;
             const extension = document.getElementById('contentExtension').value;
 
-            // FIX: PROMPT DE MODO COMPACTO MUCHO MÁS ESTRICTO
+            // Lógica de extensión optimizada para evitar cortes en modo detallado
             const extensionInstruction = extension === 'Compacto' 
-                ? "MODO COMPACTO: Prioriza la brevedad sin perder coherencia. Describe la actividad principal en 1 o 2 oraciones claras y completas por sección. Usa viñetas si hay múltiples pasos, pero asegura que se entienda el 'qué' y el 'cómo' de forma sintética."
-                : "Usa descripciones detalladas para INICIO, DESARROLLO y CIERRE.";
-
+                ? "MODO COMPACTO: Sé muy conciso. Usa viñetas (-). Máximo 2 oraciones por sección. Enfócate en la acción directa."
+                : "MODO DETALLADO (OPTIMIZADO): Genera una planificación completa y rica pedagógicamente, pero mantén una longitud CONTROLADA (aprox 4-6 oraciones por sección) para asegurar que el JSON de los 5 días quepa perfectamente en la respuesta sin cortarse. Es vital que la estructura JSON esté completa y cerrada.";
 
             // Prompt diseñado para devolver JSON
             const systemInstruction = `
@@ -1195,18 +1194,12 @@
             
             ${extensionInstruction}
             
-            REGLA DE TIEMPO CRÍTICA: La suma de las actividades de INICIO, DESARROLLO y CIERRE debe ser de un total de 60 minutos (1 hora de clase). Es IMPERATIVO que los tiempos (ej. (10 min), (40 min), (10 min)) VARÍEN COHERENTEMENTE entre los días (por ejemplo, Lunes puede ser 10/40/10, Martes 15/35/10, Miércoles 10/30/20, etc.) para reflejar una clase natural. NO asignes siempre los mismos 10/40/10.
+            REGLA DE TIEMPO CRÍTICA: La suma de las actividades de INICIO, DESARROLLO y CIERRE debe ser de un total de 60 minutos. VARÍA los tiempos entre días para naturalidad.
 
-            REGLAS DE ESTILO Y NOMENCLATURA:
-            1. **CONTENIDO DIRECTO (CRÍTICO):** NO uses etiquetas introductorias como 'Pregunta generadora:', 'Actividad de inicio:', 'Dinámica:', 'Estrategia:', etc. Empieza DIRECTAMENTE con el tiempo y la acción o pregunta. Ejemplo CORRECTO: '(5 min) ¿Qué saben de...?'. Ejemplo INCORRECTO: '(5 min) Pregunta generadora: ¿Qué saben de...?'.
-            2. TIEMPO AL INICIO: En cada actividad, pon el tiempo PRIMERO entre paréntesis. Ejemplo: "(10 min) Lluvia de ideas...".
-            3. TEXTO DIRECTO: Describe las actividades de forma fluida.
-            4. SIN TÍTULOS DE FANTASÍA.
-            5. PREGUNTAS DIRECTAS.
-            6. FORMATO JSON SEGURO: Dentro de los textos, usa comillas simples (') para evitar romper el JSON.
-
-            IMPORTANTE: RESPONDE ÚNICAMENTE CON UN OBJETO JSON VÁLIDO.
-            PROHIBIDO usar frases introductorias como: 'Pregunta generadora:', 'Actividad:', 'Dinámica:', 'Inicio:', etc. Escribe directamente el contenido.
+            REGLAS DE ESTILO OBLIGATORIAS:
+            1. **CERO ETIQUETAS:** NO uses frases como 'Pregunta generadora:', 'Actividad:', 'Inicio:'. Empieza DIRECTO con el tiempo y la acción. Ej: '(10 min) Lluvia de ideas...'.
+            2. FORMATO JSON PURO: Responde SOLO con el JSON.
+            3. NO te quedes sin espacio. Si ves que el plan es largo, resume levemente para asegurar que cierras el JSON correctamente.
             
             Estructura requerida:
             {
@@ -1218,8 +1211,6 @@
               "jueves": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." },
               "viernes": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." }
             }
-            
-            Si se piden menos de 5 días, deja las claves de los días no usados como cadenas vacías.
             `;
 
             const userPrompt = `Generar plan de ${daysCount} días para ${subject}.`;
