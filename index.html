@@ -11,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- FAVICON (Actualizado solo con tonos de la nueva paleta) -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2210%22 y=%2240%22 width=%2220%22 height=%2250%22 rx=%224%22 fill=%22%231B4965%22/><rect x=%2240%22 y=%2225%22 width=%2220%22 height=%2265%22 rx=%224%22 fill=%22%233A9D9D%22/><rect x=%2270%22 y=%2210%22 width=%2220%22 height=%2280%22 rx=%224%22 fill=%22%231B4965%22/></svg>">
+    <!-- FAVICON (Actualizado con el nuevo diseño elaborado de Planificador) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3C!-- Document background (White) --%3E%3Crect x=%2215%22 y=%2215%22 width=%2270%22 height=%2270%22 rx=%228%22 fill=%22%23FFFFFF%22 stroke=%22%231B4965%22 stroke-width=%223%22/%3E%3C!-- Corner fold for depth --%3E%3Cpath d=%22M85 15 L85 30 L70 15 Z%22 fill=%22%23E0EFFF%22/%3E %3C!-- Planner lines (Medium Teal) --%3E%3Crect x=%2225%22 y=%2230%22 width=%2250%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3Crect x=%2225%22 y=%2245%22 width=%2250%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3Crect x=%2225%22 y=%2260%22 width=%2230%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3C!-- Pencil (Dark Teal) --%3E%3Cg transform=%22rotate(45 75 80)%22%3E%3Crect x=%2265%22 y=%2270%22 width=%2230%22 height=%228%22 rx=%222%22 fill=%22%231B4965%22/%3E%3C!-- Pencil tip --%3E%3Cpolygon points=%2295,74 90,70 90,78%22 fill=%22%234B5563%22/%3E %3C!-- Eraser (Yellow Accent) --%3E%3Crect x=%2263%22 y=%2270%22 width=%224%22 height=%228%22 fill=%22%23FFC857%22/%3E%3C/g%3E%3C/svg%3E">
 
     <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Chewy&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
@@ -219,7 +219,7 @@
         
         .editable-field:focus {
             background-color: #ffffff;
-            border-color: '#1B4965'; /* Nuevo color primario */
+            border-color: #1B4965; /* Nuevo color primario */
             box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.1); /* Sombra del color primario */
         }
         
@@ -279,8 +279,8 @@
 
         /* CAMBIO: Animación de color del preloader - Ahora entre Dark Teal y Yellow */
         @keyframes tealYellowCycle {
-            0%, 100% { color: '#1B4965' } ; /* Dark Teal */
-            50% { color: '#FFC857' } ;      /* Yellow */
+            0%, 100% { color: #1B4965; } /* Dark Teal */
+            50% { color: #FFC857; }      /* Yellow */
         }
         .animate-teal-yellow-cycle { animation: tealYellowCycle 3s infinite cubic-bezier(0.4, 0, 0.2, 1); }
 
@@ -331,9 +331,9 @@
 
         /* ESTILO PARA BOTONES DE DÍA CORREGIDO */
         .day-btn.active {
-            background-color: '#1B4965'; /* Dark Teal */
+            background-color: #1B4965; /* Dark Teal */
             color: white; 
-            border-color: '#1B4965'; /* Dark Teal */
+            border-color: #1B4965; /* Dark Teal */
             box-shadow: 0 2px 5px rgba(27, 73, 101, 0.2);
         }
 
@@ -388,14 +388,14 @@
                         <div id="login-status-container" class="min-h-[40px] transition-all duration-300 rounded-lg flex items-center justify-center gap-2 border border-transparent text-center px-2 py-1 bg-gray-50">
                              <span id="login-status-text" class="text-xs font-medium text-gray-600">Ingrese sus credenciales para continuar</span>
                         </div>
-                        <button type="submit" id="btn-login" class="relative w-full bg-montessori-blue text-white font-bold text-sm py-3 rounded-lg shadow-lg shadow-montessori-blue/30 hover:bg-montessori-blue hover:shadow-montessori-blue/50 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex justify-center items-center">
+                        <button type="submit" id="btn-login" class="relative w-full bg-montessori-blue text-white font-bold text-sm py-3 rounded-lg shadow-lg shadow-montessori-blue/30 hover:bg-[#123145] hover:shadow-montessori-blue/50 hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 flex justify-center items-center">
                             <span id="btn-text">Iniciar Sesión</span>
                             <div id="btn-loader" class="loader hidden absolute w-5 h-5 border-2"></div>
                         </button>
                     </form>
                     <!-- BOTÓN DE SOPORTE -->
                     <div class="mt-4 text-center">
-                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=chrisjocoes21@gmail.com" target="_blank" class="text-[10px] text-gray-600 hover:text-montessori-blue transition-colors font-medium inline-flex items-center gap-1">
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=gestion.educativa.pinceladas@gmail.com" target="_blank" class="text-[10px] text-gray-600 hover:text-montessori-blue transition-colors font-medium inline-flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                             Soporte Técnico
                         </a>
@@ -1408,7 +1408,7 @@
                 // Jueves
                 tema_jueves: getValueOrEmpty('topic_jueves'),
                 inicio_jueves: getValueOrEmpty('inicio_jueves'),
-                desarrollo_jueves: getValueOrEmpty('desarrollo_jueves'),
+                desarrollo_jueves: getValueAORomana('desarrollo_jueves'),
                 cierre_jueves: getValueOrEmpty('cierre_jueves'),
                 tarea_jueves: getValueOrEmpty('tarea_jueves'),
                 // Viernes
