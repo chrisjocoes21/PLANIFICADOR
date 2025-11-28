@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- FAVICON (Actualizado con el nuevo diseño elaborado de Planificador) -->
+    <!-- FAVICON -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3C!-- Document background (White) --%3E%3Crect x=%2215%22 y=%2215%22 width=%2270%22 height=%2270%22 rx=%228%22 fill=%22%23FFFFFF%22 stroke=%22%231B4965%22 stroke-width=%223%22/%3E%3C!-- Corner fold for depth --%3E%3Cpath d=%22M85 15 L85 30 L70 15 Z%22 fill=%22%23E0EFFF%22/%3E %3C!-- Planner lines (Medium Teal) --%3E%3Crect x=%2225%22 y=%2230%22 width=%2250%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3Crect x=%2225%22 y=%2245%22 width=%2250%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3Crect x=%2225%22 y=%2260%22 width=%2230%22 height=%225%22 fill=%22%233A9D9D%22 rx=%221%22/%3E%3C!-- Pencil (Dark Teal) --%3E%3Cg transform=%22rotate(45 75 80)%22%3E%3Crect x=%2265%22 y=%2270%22 width=%2230%22 height=%228%22 rx=%222%22 fill=%22%231B4965%22/%3E%3C!-- Pencil tip --%3E%3Cpolygon points=%2295,74 90,70 90,78%22 fill=%22%234B5563%22/%3E %3C!-- Eraser (Yellow Accent) --%3E%3Crect x=%2263%22 y=%2270%22 width=%224%22 height=%228%22 fill=%22%23FFC857%22/%3E%3C/g%3E%3C/svg%3E">
 
     <!-- Fuentes -->
@@ -22,11 +22,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.49.1/docxtemplater.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
-    <!-- FIX FUNCIONAL: JSON5 para parsing robusto de respuestas del sistema -->
+    <!-- FIX FUNCIONAL: JSON5 para parsing robusto -->
     <script src="https://unpkg.com/json5@2/dist/index.min.js"></script>
+
+    <!-- LIBRERÍAS PARA LECTURA DE DOCUMENTOS (NUEVO) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
+        // Configuración Worker PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
         tailwind.config = {
             theme: {
                 extend: {
@@ -52,7 +59,6 @@
                     animation: {
                         'diagonal-shift': 'diagonalShift 3s ease-in-out infinite alternate',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        // Animación de color del preloader - Ahora entre Dark Teal y Yellow
                         'teal-yellow-cycle': 'tealYellowCycle 3s infinite cubic-bezier(0.4, 0, 0.2, 1)', 
                     },
                     keyframes: {
@@ -60,12 +66,10 @@
                             '0%': { 'background-position': '0% 0%' },
                             '100%': { 'background-position': '100% 100%' },
                         },
-                        // KEYFRAME: Animación de color del preloader (Dark Teal <-> Yellow)
                         tealYellowCycle: {
                             '0%, 100%': { color: '#1B4965' }, // Dark Teal
                             '50%': { color: '#FFC857' }       // Yellow
                         },
-                        // KEYFRAME: Animación de éxito de descarga/copia (Fade In/Out)
                         successFeedback: {
                             '0%': { transform: 'scale(1)', opacity: 1 },
                             '50%': { transform: 'scale(1.05)', opacity: 0.8 },
@@ -122,7 +126,6 @@
             text-shadow: 0 2px 4px rgba(255,255,255,0.5); 
         }
 
-        /* CAMBIO: Partículas solo entre Dark Teal y Medium Teal */
         .grade-particle.primary-teal { color: rgba(27, 73, 101, 0.25); }
         .grade-particle.secondary-teal { color: rgba(58, 157, 157, 0.25); }
 
@@ -140,7 +143,6 @@
         .grid-overlay {
             position: absolute;
             inset: 0;
-            /* CAMBIO: Grilla en Dark Teal */
             background-image: 
                 linear-gradient(rgba(27, 73, 101, 0.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(27, 73, 101, 0.02) 1px, transparent 1px);
@@ -148,7 +150,6 @@
             z-index: 0;
         }
 
-        /* Fondo diagonal uniforme con el nuevo lightBlue */
         .animated-diagonal-background {
             background: repeating-linear-gradient(
                 45deg, 
@@ -178,12 +179,12 @@
         .plan-card:hover { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         
         .day-header {
-            color: #1B4965; /* CAMBIO: Usar Dark Teal en lugar de color de peligro */
+            color: #1B4965;
             font-family: 'Montserrat', sans-serif;
             font-weight: 800;
             text-transform: uppercase;
             font-size: 1rem;
-            border-bottom: 2px solid #E0EFFF; /* Base lightBlue */
+            border-bottom: 2px solid #E0EFFF;
             padding-bottom: 0.5rem;
             margin-bottom: 1rem;
         }
@@ -196,14 +197,15 @@
             color: #64748b;
             margin-bottom: 0.3rem;
             letter-spacing: 0.05em;
+            margin-top: 1rem;
         }
+        .section-label:first-of-type { margin-top: 0; }
 
         .editable-field {
             width: 100%;
             padding: 0.5rem 0.75rem;
             border: 1px solid #e2e8f0;
             border-radius: 0.5rem;
-            /* FIX UX: text-base en mobile previene zoom */
             font-size: 16px; 
             line-height: 1.5;
             color: #334155;
@@ -219,12 +221,12 @@
         
         .editable-field:focus {
             background-color: #ffffff;
-            border-color: #1B4965; /* Nuevo color primario */
-            box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.1); /* Sombra del color primario */
+            border-color: #1B4965;
+            box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.1);
         }
         
         .field-topic { height: 3rem; font-weight: 600; }
-        .field-activities { height: 8rem; }
+        .field-materials { height: 4rem; }
 
         /* Toast Notification */
         #toast {
@@ -250,15 +252,13 @@
 
         /* --- ANIMACIONES GENERALES --- */
         
-        /* CORRECCIÓN ANIMACIÓN FOOTER */
         @keyframes colorPulseFooter {
-            0% { color: #4B5563; } /* Gray-600 */
-            33% { color: #FFC857; } /* Yellow */
-            66% { color: #1B4965; } /* Dark Teal */
-            100% { color: #4B5563; } /* Gray-600 */
+            0% { color: #4B5563; }
+            33% { color: #FFC857; }
+            66% { color: #1B4965; }
+            100% { color: #4B5563; }
         }
         
-        /* Aplicamos la animación explícitamente */
         .animate-pulse-color { 
             animation: colorPulseFooter 4s ease-in-out infinite !important; 
         }
@@ -266,7 +266,6 @@
         .fade-out { animation: fadeOut 0.4s ease-out forwards; }
         @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.99); pointer-events: none; } }
         
-        /* Loader circular (Login) */
         .loader {
             border: 3px solid rgba(255,255,255,0.3); 
             border-radius: 50%; 
@@ -281,14 +280,12 @@
         #btn-text { transition: opacity 0.3s; }
         #btn-text.hidden-text { opacity: 0; }
 
-        /* CAMBIO: Animación de color del preloader - Ahora entre Dark Teal y Yellow */
         @keyframes tealYellowCycle {
-            0%, 100% { color: #1B4965; } /* Dark Teal */
-            50% { color: #FFC857; }      /* Yellow */
+            0%, 100% { color: #1B4965; }
+            50% { color: #FFC857; }
         }
         .animate-teal-yellow-cycle { animation: tealYellowCycle 3s infinite cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* Clase para la animación de feedback del botón de descarga */
         .animate-success-feedback {
             animation: successFeedback 0.3s ease-in-out;
         }
@@ -302,9 +299,8 @@
             font-size: 0.875rem; font-weight: 500; color: #1f2937;
             cursor: pointer; transition: all 0.2s;
         }
-        .custom-select-trigger:hover { border-color: #1B4965; } /* Dark Teal */
+        .custom-select-trigger:hover { border-color: #1B4965; }
         
-        /* Dropdown list styles */
         .custom-dropdown-list {
             position: absolute; 
             top: 100%; 
@@ -334,15 +330,14 @@
         }
         
         .custom-dropdown-list button:hover { 
-            background-color: #E0EFFF; /* Light Blue */
-            color: #1B4965; /* Dark Teal */
+            background-color: #E0EFFF; 
+            color: #1B4965; 
         }
 
-        /* ESTILO PARA BOTONES DE DÍA CORREGIDO */
         .day-btn.active {
-            background-color: #1B4965; /* Dark Teal */
+            background-color: #1B4965;
             color: white; 
-            border-color: #1B4965; /* Dark Teal */
+            border-color: #1B4965;
             box-shadow: 0 2px 5px rgba(27, 73, 101, 0.2);
         }
 
@@ -355,7 +350,6 @@
         <div class="animated-diagonal-background animate-diagonal-shift"></div>
         <div class="particles-container z-10"><div class="grid-overlay"></div></div>
         <div class="relative z-20 flex flex-col items-center justify-center">
-            <!-- CAMBIO: Animación de color del preloader ahora usa teal-yellow-cycle -->
             <h1 class="text-5xl md:text-7xl font-bold font-montserrat animate-teal-yellow-cycle drop-shadow-sm text-center leading-tight">Cargando...</h1>
         </div>
     </div>
@@ -367,14 +361,12 @@
         
         <div id="login-card" class="relative z-20 w-full max-w-3xl mx-4 transition-all duration-700">
             <div class="bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[380px]">
-                <!-- Panel de Título: Colores invertidos: Fondo Dark Teal y texto Blanco -->
                 <div class="w-full md:w-5/12 bg-montessori-blue flex flex-col items-center justify-center p-6 border-b md:border-b-0 md:border-r border-montessori-blue gap-4">
                     <h1 class="text-3xl md:text-5xl font-extrabold text-white font-montserrat text-center leading-snug tracking-tight">
                         Planificador Docente
                     </h1>
                     <p class="text-sm text-white/90 font-medium text-center mt-2">Herramienta de Productividad Educativa</p>
                 </div>
-                <!-- Formulario de Login -->
                 <div class="w-full md:w-7/12 p-6 md:p-8 flex flex-col justify-center">
                     <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
                         <div>
@@ -402,7 +394,6 @@
                             <div id="btn-loader" class="loader hidden absolute w-5 h-5 border-2"></div>
                         </button>
                     </form>
-                    <!-- BOTÓN DE SOPORTE -->
                     <div class="mt-4 text-center">
                         <a href="https://mail.google.com/mail/?view=cm&fs=1&to=gestion.educativa.pinceladas@gmail.com" target="_blank" class="text-[10px] text-gray-600 hover:text-montessori-blue transition-colors font-medium inline-flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -449,35 +440,59 @@
             <div class="flex-1 flex flex-col md:flex-row gap-6 overflow-hidden">
                 <!-- Columna Izquierda: Instrucciones -->
                 <div class="flex-1 flex flex-col overflow-hidden">
-                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Instrucciones Adicionales / Adaptaciones</label>
-                    <textarea id="instructions-input" class="w-full flex-1 p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:border-montessori-blue focus:ring-2 focus:ring-montessori-lightBlue outline-none resize-none transition-all" placeholder="Ej: Enfocarse en ejercicios prácticos, usar materiales concretos, adaptar para alumno con TDAH..."></textarea>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Instrucciones Adicionales</label>
+                    <textarea id="instructions-input" class="w-full flex-1 p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:border-montessori-blue focus:ring-2 focus:ring-montessori-lightBlue outline-none resize-none transition-all" placeholder="Ej: Enfocarse en ejercicios prácticos..."></textarea>
                 </div>
 
-                <!-- Columna Derecha: Imágenes -->
+                <!-- Columna Derecha: Archivos -->
                 <div class="flex-1 flex flex-col overflow-hidden border-t md:border-t-0 md:border-l border-gray-100 pt-4 md:pt-0 md:pl-6">
                     <div class="flex justify-between items-end mb-2 flex-shrink-0">
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Fotos del Libro / Actividad</label>
-                        <span id="img-count" class="text-[10px] text-gray-400 font-medium">0/6</span>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider">Archivos (Img, PDF, Docx)</label>
+                        <span id="img-count" class="text-[10px] text-gray-400 font-medium">0/12</span>
                     </div>
                     
-                    <input type="file" id="image-upload" accept="image/*" multiple class="hidden" onchange="handleImageUpload(event)">
+                    <input type="file" id="image-upload" accept="image/*,.pdf,.docx" multiple class="hidden" onchange="handleFileUpload(event)">
                     
                     <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer flex-shrink-0" onclick="document.getElementById('image-upload').click()">
                         <div class="text-gray-400 flex flex-col items-center gap-2">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <span class="text-xs font-medium">Toca para adjuntar fotos</span>
+                            <span class="text-xs font-medium">Adjuntar Archivos</span>
                         </div>
                     </div>
 
-                    <div id="images-grid" class="hidden grid grid-cols-2 lg:grid-cols-3 gap-2 mt-3 overflow-y-auto custom-scroll pr-1">
-                        <!-- Imágenes -->
-                    </div>
+                    <div id="images-grid" class="hidden grid grid-cols-2 lg:grid-cols-3 gap-2 mt-3 overflow-y-auto custom-scroll pr-1"></div>
+                    <div id="docs-list" class="mt-2 space-y-1 overflow-y-auto max-h-[100px] custom-scroll"></div>
                 </div>
             </div>
 
             <div class="mt-4 flex justify-end gap-3 pt-3 border-t border-gray-100 flex-shrink-0">
                 <button onclick="toggleInstructionsModal()" class="px-4 py-2 text-sm text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancelar</button>
                 <button onclick="saveInstructions()" class="px-6 py-2 bg-montessori-blue text-white text-sm font-bold rounded-lg hover:bg-[#123145] transition-colors shadow-lg shadow-montessori-blue/30">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL DE COMENTARIOS / MODIFICACIÓN (NUEVO) -->
+    <div id="modification-modal" class="hidden fixed inset-0 z-[260] flex items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-4xl w-full mx-4 border border-gray-100 flex flex-col h-[60vh] md:h-[50vh] transition-all transform duration-300">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-100 flex-shrink-0">
+                <h3 class="text-lg font-bold text-montessori-blue font-montserrat flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    Modificar Plan Actual
+                </h3>
+                <button onclick="toggleModificationModal()" class="text-gray-400 hover:text-montessori-red transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <div class="flex-1 flex flex-col gap-2">
+                <p class="text-xs text-gray-500 font-medium">Describe qué cambios quieres hacer al plan visible actualmente (ej: "Cambia la actividad del martes por algo más lúdico").</p>
+                <textarea id="modification-input" class="w-full flex-1 p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:border-montessori-blue focus:ring-2 focus:ring-montessori-lightBlue outline-none resize-none transition-all" placeholder="Solicita cambios específicos..."></textarea>
+            </div>
+
+            <div class="mt-4 flex justify-end gap-3 pt-3 border-t border-gray-100 flex-shrink-0">
+                <button onclick="toggleModificationModal()" class="px-4 py-2 text-sm text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancelar</button>
+                <button onclick="applyModification()" class="px-6 py-2 bg-montessori-blue text-white text-sm font-bold rounded-lg hover:bg-[#123145] transition-colors shadow-lg shadow-montessori-blue/30">Aplicar Cambios</button>
             </div>
         </div>
     </div>
@@ -494,25 +509,21 @@
         <!-- HEADER -->
         <header class="bg-white/90 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50 h-16 flex-shrink-0 w-full shadow-sm">
             <div class="w-full px-6 h-full flex justify-between items-center">
-                <!-- Eliminación del logo y reemplazo por texto simple -->
                 <div class="flex items-center cursor-pointer" onclick="location.reload()">
                      <h1 class="text-lg font-bold text-montessori-blue font-montserrat">Planificador</h1>
                 </div>
                 
-                <!-- Info de Usuario -->
                 <div class="flex items-center gap-4">
                     <div class="flex flex-col items-end mr-2">
                          <div class="flex items-center gap-1">
                              <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-tight">Hola,</span>
                              <span id="user-name-display" class="text-xs font-black text-montessori-blue leading-tight max-w-[150px] truncate text-right">Usuario</span>
                          </div>
-                         <!-- Uso de lightBlue y Primary/Danger colors -->
                          <div class="bg-montessori-lightBlue px-3 py-1 rounded-lg mt-1 border border-montessori-lightBlue/50 flex items-center justify-center gap-2 h-6" id="quota-badge">
                              <span class="text-[10px] font-bold text-gray-500 uppercase leading-none">Usos hoy:</span>
                              <span id="usage-counter" class="text-xs font-black text-montessori-red leading-none pt-[1px]">...</span>
                          </div>
                     </div>
-                    <!-- Uso de Danger color -->
                     <button onclick="logout()" class="p-2 text-montessori-red/70 hover:text-montessori-red hover:bg-red-50 rounded-full transition-colors" title="Cerrar Sesión">
                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                     </button>
@@ -543,7 +554,7 @@
                             <input type="text" id="groupDetails" placeholder="Ej. 3ro Primaria" required class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue text-base md:text-sm font-medium">
                         </div>
 
-                        <!-- SELECT MODERNIZADO -->
+                        <!-- SELECT MODELO PEDAGÓGICO (ORDENADO Y AÑADIDO PROYECTOS ARTICULADOS) -->
                         <div class="relative custom-select-container">
                             <label class="block text-xs font-bold text-gray-600 uppercase tracking-wider mb-1.5">Modelo Pedagógico</label>
                             <div id="style-dropdown-btn" class="custom-select-trigger" onclick="toggleDropdown('style')">
@@ -551,17 +562,22 @@
                                 <svg class="h-4 w-4 text-gray-600 transform transition-transform duration-200" id="style-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                             </div>
                             <div id="style-dropdown-list" class="custom-dropdown-list hidden">
+                                <!-- ORDENADO POR LONGITUD DE NOMBRE -->
                                 <button type="button" onclick="selectDropdownValue('style', 'Montessori')">Montessori</button>
-                                <button type="button" onclick="selectDropdownValue('style', 'Líder en Mí')">Líder en Mí</button>
                                 <button type="button" onclick="selectDropdownValue('style', 'Tradicional')">Tradicional</button>
+                                <button type="button" onclick="selectDropdownValue('style', 'Líder en Mí')">Líder en Mí</button>
+                                <button type="button" onclick="selectDropdownValue('style', 'Gamificación')">Gamificación</button>
+                                <button type="button" onclick="selectDropdownValue('style', 'Aula Invertida')">Aula Invertida</button>
+                                <button type="button" onclick="selectDropdownValue('style', 'ABP (Proyectos)')">ABP (Proyectos)</button>
                                 <button type="button" onclick="selectDropdownValue('style', 'Adecuación Curricular')">Adecuación Curricular</button>
+                                <button type="button" onclick="selectDropdownValue('style', 'Aprendizaje Cooperativo')">Aprendizaje Cooperativo</button>
                                 <button type="button" onclick="selectDropdownValue('style', 'Enseñanza por Competencias')">Enseñanza por Competencias</button>
+                                <button type="button" onclick="selectDropdownValue('style', 'Proyectos con Articulación de Áreas')">Proyectos con Articulación de Áreas</button>
                             </div>
-                            <!-- CAMBIO: Valor inicial vacío -->
                             <input type="hidden" id="teachingStyle" value="">
                         </div>
                         
-                        <!-- SECCIÓN NUEVA: CARGA DE PLANTILLA WORD -->
+                        <!-- EXPORTAR A WORD -->
                         <div class="border-t border-gray-100 pt-3 mt-1">
                             <label class="block text-xs font-bold text-montessori-blue uppercase tracking-wider mb-2 flex items-center gap-1">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -596,14 +612,12 @@
                             <textarea id="topics" class="w-full h-12 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-800 focus:bg-white focus:border-montessori-blue focus:ring-2 focus:ring-montessori-blue/20 outline-none transition-all duration-300 text-base md:text-sm font-medium resize-none" placeholder="Describa los temas..."></textarea>
                         </div>
                         
-                        <!-- Botón de instrucciones: Usando Primary y Danger colors -->
                         <button type="button" id="btn-instructions" onclick="toggleInstructionsModal()" class="w-full py-2.5 px-3 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-gray-600 hover:text-montessori-blue hover:border-montessori-blue hover:bg-montessori-lightBlue transition-all duration-300 flex items-center justify-center gap-2 group">
-                            <span class="text-xs font-bold truncate" id="btn-instructions-text">Añadir Instrucciones / Fotos</span>
+                            <span class="text-xs font-bold truncate" id="btn-instructions-text">Recursos (Img/PDF/Doc)</span>
                             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
                         </button>
                         <input type="hidden" id="customInstructions" value="">
 
-                        <!-- Botón de generar usa el nuevo color primario y sombra -->
                         <button type="submit" id="btn-generate" class="group relative w-full bg-montessori-blue hover:bg-[#123145] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-montessori-blue/30 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 overflow-hidden mt-4">
                             <span class="relative z-10 flex items-center gap-2">GENERAR PLAN</span>
                             <div class="absolute inset-0 h-full w-full scale-0 rounded-2xl transition-all duration-300 group-hover:scale-100 group-hover:bg-white/10"></div>
@@ -615,7 +629,6 @@
             <!-- PANEL DERECHO: RESULTADOS (EDITOR MANUAL) -->
             <div class="w-full md:w-3/4 h-full flex flex-col relative min-h-0">
                 
-                <!-- Placeholder (Usa Primary y Light Blue) -->
                 <div id="result-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 bg-white/50 backdrop-blur-sm border-2 border-dashed border-gray-300 rounded-2xl">
                     <div class="w-20 h-20 bg-montessori-lightBlue rounded-full flex items-center justify-center mb-4 animate-pulse-slow">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-montessori-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
@@ -624,19 +637,16 @@
                     <p class="text-gray-500 text-sm max-w-sm">Genera un plan con el sistema, edita el contenido tarjeta por tarjeta y expórtalo a tu Word personalizado.</p>
                 </div>
 
-                <!-- Loader (Usa Primary y Danger colors) -->
                 <div id="loader" class="hidden absolute inset-0 z-20 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-2xl transition-all duration-300">
                     <div class="flex flex-col items-center">
                         <div class="relative w-20 h-20 mb-6">
                             <div class="absolute inset-0 rounded-full border-4 border-gray-100"></div>
-                            <!-- CAMBIO 1: Sustitución de border-montessori-red por Medium Teal -->
                             <div class="absolute inset-0 rounded-full border-4 border-montessori-teal border-t-transparent animate-spin"></div>
                             <div class="absolute inset-3 rounded-full border-4 border-montessori-blue border-t-transparent animate-spin" style="animation-direction: reverse; animation-duration: 2s;"></div>
                         </div>
                         <div class="text-center space-y-2">
-                            <!-- CAMBIO 2: Sustitución de text-montessori-blue por Dark Teal -->
                             <h3 class="text-lg font-bold text-montessori-blue font-montserrat animate-pulse">Analizando Recursos...</h3>
-                            <p class="text-xs text-gray-500 font-medium">Creando actividades personalizadas...</p>
+                            <p class="text-xs text-gray-500 font-medium">Leyendo documentos y generando actividades...</p>
                         </div>
                     </div>
                 </div>
@@ -644,7 +654,6 @@
                 <!-- Contenedor de Resultados con Editor -->
                 <div id="result-content" class="hidden h-full flex-col bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 relative z-10 transition-all duration-500 transform translate-y-4 opacity-0 flex-1">
                     
-                    <!-- BARRA SUPERIOR -->
                     <div class="flex justify-between items-center px-4 py-2 bg-gray-50 border-b border-gray-200 flex-shrink-0 h-14">
                         <div class="flex items-center gap-2">
                              <div class="flex flex-col">
@@ -654,7 +663,11 @@
                         </div>
                         
                         <div class="flex gap-2">
-                            <!-- BOTÓN DESCARGA WORD: Usando el color Secundario (Medium Teal) -->
+                            <!-- BOTÓN DE MODIFICACIÓN (NUEVO) -->
+                            <button id="btn-modify" onclick="toggleModificationModal()" class="hidden flex items-center gap-2 px-3 py-1.5 bg-montessori-yellow text-slate-800 rounded-lg hover:bg-yellow-400 shadow-md transition-all font-bold text-xs">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                MODIFICAR
+                            </button>
                             <button id="btn-download-word" onclick="downloadWord()" class="hidden flex items-center gap-2 px-4 py-1.5 bg-montessori-teal text-white rounded-lg hover:bg-[#288B8B] shadow-md transition-all font-bold text-xs">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 DESCARGAR WORD
@@ -662,7 +675,6 @@
                         </div>
                     </div>
                     
-                    <!-- ÁREA DE EDICIÓN MANUAL (GRID DE TARJETAS) -->
                     <div class="flex-1 overflow-y-auto custom-scroll p-6 bg-gray-50/50" id="editor-container">
                         <!-- AQUÍ SE INYECTARÁN LAS TARJETAS (JS) -->
                     </div>
@@ -670,7 +682,6 @@
             </div>
         </main>
         
-        <!-- Footer -->
         <footer class="bg-white/90 backdrop-blur-sm border-t border-gray-200 py-4 mt-auto flex-shrink-0 w-full z-10">
             <div class="text-center text-[10px] sm:text-xs text-gray-600">
                 <a href="https://chrisjocoes21.github.io/PORTAFOLIO/" target="_blank" class="animate-pulse-color font-medium transition-colors hover:text-montessori-blue hover:underline" title="Visitar Portafolio">
@@ -692,11 +703,11 @@
         let currentUser = null;
         let dailyQuota = { remaining: 0, total: 0 };
         let attachedImages = [];
-        const MAX_IMAGES = 6;
-        let currentPlanData = null; // Almacenará el JSON original de la herramienta
+        let attachedDocsText = ""; 
+        const MAX_IMAGES = 12; // Límite aumentado
+        let currentPlanData = null;
 
         // --- PARTÍCULAS DEL FONDO ---
-        // CAMBIO: Símbolos pedagógicos en lugar de números de calificaciones
         const symbols = ['Inicio', 'Desarrollo', 'Cierre', 'Obj.', 'Meta', 'Tiempo', 'Recursos', 'Eval.', 'Actividad', 'Plan', 'Clase'];
 
         function initAllParticles() {
@@ -713,25 +724,19 @@
                 const span = document.createElement('span');
                 span.textContent = symbols[Math.floor(Math.random() * symbols.length)];
                 span.classList.add('grade-particle');
-                
-                // FIX: Usar las nuevas clases de Teal en lugar de 'blue' y 'red'
                 if (Math.random() > 0.5) span.classList.add('primary-teal');
                 else span.classList.add('secondary-teal');
-
                 const rotation = Math.floor(Math.random() * 40 - 20);
                 span.style.setProperty('--rotation', `${rotation}deg`);
-
                 span.classList.add('background');
                 const left = Math.random() * 100;
                 const duration = 15 + Math.random() * 20; 
                 const delay = Math.random() * -30; 
                 const size = 0.8 + Math.random() * 1.2; 
-
                 span.style.left = `${left}%`;
                 span.style.animationDuration = `${duration}s`;
                 span.style.animationDelay = `${delay}s`;
                 span.style.fontSize = `${size}rem`;
-
                 container.appendChild(span);
             }
         }
@@ -772,7 +777,6 @@
             loader.classList.remove('hidden');
             btn.disabled = true;
             
-            // Uso de clases personalizadas para colores de estado de login
             statusBox.className = "min-h-[40px] transition-all duration-300 rounded-lg flex items-center justify-center gap-2 border px-2 py-1 bg-montessori-lightBlue border-montessori-lightBlue/50";
             statusText.className = "text-xs font-bold text-montessori-blue";
             statusText.innerText = "Verificando credenciales...";
@@ -799,26 +803,21 @@
                                 loginTime: new Date().getTime()
                             };
                             sessionStorage.setItem('pinceladas_session', JSON.stringify(sessionData));
-                            
                             dailyQuota.remaining = quotaData.remaining;
                             dailyQuota.total = quotaData.limit;
-                            
                             loginUserSuccess(data.name, data.usernameUnique, false);
                         }
                     } else {
                          throw new Error("Error al verificar cuota.");
                     }
-
                 } else {
                     throw new Error("Credenciales incorrectas");
                 }
             } catch (error) {
                 console.error(error);
-                // Uso de clases personalizadas para errores
                 statusBox.className = "min-h-[40px] transition-all duration-300 rounded-lg flex items-center justify-center gap-2 border px-2 py-1 bg-red-50 border-red-200";
                 statusText.className = "text-xs font-bold text-red-600";
                 statusText.innerText = error.message.includes("Credenciales") ? "Usuario o contraseña incorrectos" : "Error de conexión";
-                
                 btnText.classList.remove('hidden-text');
                 loader.classList.add('hidden');
                 btn.disabled = false;
@@ -837,7 +836,6 @@
         function loginUserSuccess(name, usernameUnique, isAutoLogin) {
             currentUser = usernameUnique;
             document.getElementById('user-name-display').innerText = name; 
-            
             const loginScreen = document.getElementById('login-screen');
             const loader = document.getElementById('initial-loader');
             const appContent = document.getElementById('app-content');
@@ -845,12 +843,10 @@
             loginScreen.classList.add('fade-out');
             setTimeout(() => loginScreen.classList.add('hidden'), 500);
             
-            // FIX LOGICO: Siempre ocultar loader, incluso en auto-login (F5)
             if(!isAutoLogin) {
                  loader.classList.add('hidden');
             } else {
                 refreshQuota(usernameUnique);
-                // Añadimos efecto de salida suave para el loader inicial en F5
                 loader.classList.add('opacity-0');
                 setTimeout(() => loader.classList.add('hidden'), 700);
             }
@@ -887,7 +883,6 @@
             const counter = document.getElementById('usage-counter');
             if(dailyQuota.total > 0) {
                 counter.innerText = `${dailyQuota.remaining} / ${dailyQuota.total}`;
-                // Uso de clases personalizadas
                 if(dailyQuota.remaining === 0) counter.className = "text-[10px] font-black text-montessori-red";
                 else counter.className = "text-[10px] font-black text-montessori-blue";
             } else {
@@ -895,7 +890,6 @@
             }
         }
 
-        // --- UTILIDADES ---
         function showToast(message) {
             const toast = document.getElementById("toast");
             toast.innerText = message;
@@ -915,7 +909,6 @@
             }
         }
 
-        // --- GESTIÓN DE PLANTILLA WORD ---
         function handleTemplateSelect(event) {
             const file = event.target.files[0];
             if (file) {
@@ -924,286 +917,253 @@
             }
         }
 
-        // --- IMÁGENES ---
-        async function handleImageUpload(event) {
+        // --- MANEJO DE ARCHIVOS (IMÁGENES + DOCUMENTOS) ---
+        async function handleFileUpload(event) {
             const files = Array.from(event.target.files);
             if (files.length === 0) return;
-
-            if (attachedImages.length + files.length > MAX_IMAGES) {
-                showToast(`Máximo ${MAX_IMAGES} imágenes permitidas.`);
-                event.target.value = ""; 
-                return;
-            }
-
             const uploadArea = document.getElementById('upload-area');
             const originalText = uploadArea.innerHTML;
-            // Uso de clases personalizadas para color de estado
             uploadArea.innerHTML = '<span class="text-xs text-montessori-blue font-bold animate-pulse">Procesando...</span>';
 
-            try {
-                const compressedPromises = files.map(file => compressImage(file, 800, 0.7));
-                const newImages = await Promise.all(compressedPromises);
-                attachedImages = [...attachedImages, ...newImages];
-                renderImagePreviews();
-            } catch (err) {
-                showToast("Error al procesar alguna imagen.");
-                console.error(err);
-            } finally {
-                uploadArea.innerHTML = originalText;
-                document.getElementById('image-upload').value = ""; 
+            for (const file of files) {
+                if (file.type.startsWith('image/')) {
+                    if (attachedImages.length >= MAX_IMAGES) { showToast("Límite de imágenes alcanzado"); continue; }
+                    try { const base64 = await compressImage(file, 800, 0.7); attachedImages.push(base64); } catch(e){ console.error(e); }
+                } else if (file.type === 'application/pdf') {
+                    try { 
+                        const text = await extractTextFromPDF(file); 
+                        attachedDocsText += `\n\n--- CONTENIDO PDF (${file.name}) ---\n${text.substring(0, 15000)}... [Truncado]`; 
+                        renderDocPreview(file.name, 'PDF');
+                    } catch(e){ showToast("Error leyendo PDF"); }
+                } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                    try {
+                        const text = await extractTextFromDocx(file);
+                        attachedDocsText += `\n\n--- CONTENIDO DOCX (${file.name}) ---\n${text.substring(0, 15000)}... [Truncado]`;
+                        renderDocPreview(file.name, 'DOCX');
+                    } catch(e){ showToast("Error leyendo DOCX"); }
+                }
             }
+            renderImagePreviews();
+            uploadArea.innerHTML = originalText;
+            event.target.value = "";
+        }
+
+        async function extractTextFromPDF(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+            let fullText = "";
+            const maxPages = Math.min(pdf.numPages, 5); // Límite de páginas para eficiencia
+            for (let i = 1; i <= maxPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                fullText += textContent.items.map(item => item.str).join(" ") + "\n";
+            }
+            return fullText;
+        }
+
+        async function extractTextFromDocx(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
+            return result.value; 
         }
 
         function renderImagePreviews() {
             const grid = document.getElementById('images-grid');
             const uploadArea = document.getElementById('upload-area');
             const counter = document.getElementById('img-count');
-
             grid.innerHTML = ''; 
-
             if (attachedImages.length > 0) {
                 grid.classList.remove('hidden');
-                if (attachedImages.length >= MAX_IMAGES) {
-                    uploadArea.classList.add('hidden');
-                } else {
-                    uploadArea.classList.remove('hidden');
-                }
-
+                uploadArea.classList.remove('hidden'); 
                 attachedImages.forEach((base64, index) => {
                     const div = document.createElement('div');
                     div.className = "relative group rounded-lg overflow-hidden border border-gray-200 aspect-square";
-                    div.innerHTML = `
-                        <img src="${base64}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="removeImage(${index})" class="bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 shadow-sm transition-transform hover:scale-110">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            </button>
-                        </div>
-                    `;
+                    div.innerHTML = `<img src="${base64}" class="w-full h-full object-cover"><button onclick="removeImage(${index})" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>`;
                     grid.appendChild(div);
                 });
-            } else {
-                grid.classList.add('hidden');
-                uploadArea.classList.remove('hidden');
-            }
+            } else { grid.classList.add('hidden'); uploadArea.classList.remove('hidden'); }
             counter.innerText = `${attachedImages.length}/${MAX_IMAGES}`;
         }
 
-        function removeImage(index) {
-            attachedImages.splice(index, 1);
-            renderImagePreviews();
+        function renderDocPreview(name, type) {
+            const list = document.getElementById('docs-list');
+            const item = document.createElement('div');
+            item.className = "text-xs bg-gray-100 p-2 rounded flex justify-between items-center";
+            item.innerHTML = `<span class="truncate font-bold text-gray-700">[${type}] ${name}</span>`;
+            list.appendChild(item);
         }
 
+        function removeImage(index) { attachedImages.splice(index, 1); renderImagePreviews(); }
+        
         function compressImage(file, maxWidth, quality) {
             return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = event => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', quality));
-                    };
-                    img.onerror = error => reject(error);
-                };
-                reader.onerror = error => reject(error);
+                const reader = new FileReader(); reader.readAsDataURL(file);
+                reader.onload = event => { const img = new Image(); img.src = event.target.result; img.onload = () => { const canvas = document.createElement('canvas'); let w = img.width; let h = img.height; if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth; } canvas.width = w; canvas.height = h; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, w, h); resolve(canvas.toDataURL('image/jpeg', quality)); }; img.onerror = reject; }; reader.onerror = reject;
             });
         }
 
-        // --- MODAL DE INSTRUCCIONES ---
-        function toggleInstructionsModal() {
-            const modal = document.getElementById('instructions-modal');
-            modal.classList.toggle('hidden');
-        }
-
+        // --- MODALS ---
+        function toggleInstructionsModal() { document.getElementById('instructions-modal').classList.toggle('hidden'); }
         function saveInstructions() {
             const input = document.getElementById('instructions-input');
             const hiddenField = document.getElementById('customInstructions');
             const btn = document.getElementById('btn-instructions');
             const btnText = document.getElementById('btn-instructions-text');
-            
             hiddenField.value = input.value.trim();
             toggleInstructionsModal();
-
+            const count = attachedImages.length + (attachedDocsText ? 1 : 0);
             const hasText = hiddenField.value.length > 0;
-            const imgCount = attachedImages.length;
-
-            if (hasText || imgCount > 0) {
-                // Nuevo color de peligro
-                btn.className = "w-full py-2.5 px-3 rounded-lg bg-montessori-red text-white border border-transparent shadow-md hover:bg-red-700 transition-all duration-300 flex items-center justify-center gap-2 group";
-                if (hasText && imgCount > 0) btnText.textContent = `Instrucciones + ${imgCount} Fotos`;
-                else if (imgCount > 0) btnText.textContent = `${imgCount} Fotos Adjuntadas`;
-                else btnText.textContent = "Instrucciones Guardadas";
+            if (hasText || count > 0) {
+                btn.className = "w-full py-2.5 px-3 rounded-lg bg-montessori-blue text-white border border-transparent shadow-md hover:bg-[#123145] transition-all duration-300 flex items-center justify-center gap-2 group";
+                btnText.textContent = `Recursos (${count}) + Nota Guardada`;
             } else {
-                // Nuevo color primario y de fondo claro
                 btn.className = "w-full py-2.5 px-3 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-gray-600 hover:text-montessori-blue hover:border-montessori-blue hover:bg-montessori-lightBlue transition-all duration-300 flex items-center justify-center gap-2 group";
-                btnText.textContent = "Añadir Instrucciones / Fotos";
+                btnText.textContent = "Recursos (Img/PDF/Doc)";
             }
+        }
+
+        function toggleModificationModal() { document.getElementById('modification-modal').classList.toggle('hidden'); }
+        
+        async function applyModification() {
+            const request = document.getElementById('modification-input').value;
+            if(!request) return;
+            toggleModificationModal();
+            showToast("Aplicando cambios... espera un momento");
+            await generatePlan(null, true, request);
         }
 
         // --- DROPDOWNS ---
         function initDropdowns() {}
         function toggleDropdown(type) {
-            const list = type === 'style' ? document.getElementById('style-dropdown-list') : null;
-            const chevron = type === 'style' ? document.getElementById('style-chevron') : null;
+            const list = document.getElementById(`${type}-dropdown-list`);
+            const chevron = document.getElementById(`${type}-chevron`);
             if (list) {
                 list.classList.toggle('hidden');
                 if(chevron) chevron.classList.toggle('rotate-180');
             }
         }
         function selectDropdownValue(type, value) {
-            document.getElementById('teachingStyle').value = value;
-            const textSpan = document.getElementById('selected-style-text');
-            textSpan.textContent = value;
-            // FIX: Cambiar estilo al seleccionar
-            textSpan.classList.remove('text-gray-500', 'font-normal');
-            textSpan.classList.add('text-gray-900', 'font-medium');
-            
-            document.getElementById('style-dropdown-list').classList.add('hidden');
-            document.getElementById('style-chevron').classList.remove('rotate-180');
+            if(type === 'style') {
+                document.getElementById('teachingStyle').value = value;
+                const textSpan = document.getElementById('selected-style-text');
+                textSpan.textContent = value;
+                textSpan.classList.remove('text-gray-500', 'font-normal');
+                textSpan.classList.add('text-gray-900', 'font-medium');
+            }
+            document.getElementById(`${type}-dropdown-list`).classList.add('hidden');
+            const chevron = document.getElementById(`${type}-chevron`);
+            if(chevron) chevron.classList.remove('rotate-180');
         }
 
         document.addEventListener('click', function(e) {
-            const styleBtn = document.getElementById('style-dropdown-btn');
-            const styleList = document.getElementById('style-dropdown-list');
-            if (styleList && !styleList.classList.contains('hidden') && !styleList.contains(e.target) && !styleBtn.contains(e.target)) {
-                styleList.classList.add('hidden');
-                document.getElementById('style-chevron').classList.remove('rotate-180');
+            if(!e.target.closest('.custom-select-container')) {
+                document.querySelectorAll('.custom-dropdown-list').forEach(list => {
+                    list.classList.add('hidden');
+                });
+                document.querySelectorAll('[id$="-chevron"]').forEach(c => c.classList.remove('rotate-180'));
             }
         });
-        
-        // --- HELPER DE REINTENTO ---
+
+        // --- CORE: GENERACIÓN ---
         async function fetchWithRetry(url, options, retries = 3, delay = 2000) {
             let lastError;
-            let lastResponse;
-
             for (let i = 0; i < retries; i++) {
                 try {
                     const response = await fetch(url, options);
-                    
-                    // Check HTTP status
-                    if (response.status === 503 || response.status === 429) {
-                        throw new Error("HTTP_OVERLOAD");
-                    }
-
-                    // Check API specific Logical error (Model Overloaded often comes as 200 OK in GAS proxies)
-                    // We must clone because we consume the stream
+                    if (response.status === 503 || response.status === 429) throw new Error("HTTP_OVERLOAD");
                     const clone = response.clone();
-                    try {
-                        const data = await clone.json();
-                        // Check for specific "overloaded" or "capacity" messages in the error field
-                        if (data.success === false) {
-                            const err = (data.error || "").toLowerCase();
-                            if (err.includes("overloaded") || err.includes("capacity") || err.includes("too many requests")) {
-                                throw new Error("LOGICAL_OVERLOAD");
-                            }
-                        }
-                    } catch (jsonErr) {
-                        // If it's not JSON, ignore and let main logic handle
-                    }
-
-                    return response; // Return valid response (success or non-retryable error)
-
+                    try { const data = await clone.json(); if (data.success === false && (data.error||"").toLowerCase().includes("overloaded")) throw new Error("LOGICAL_OVERLOAD"); } catch (e) {}
+                    return response; 
                 } catch (err) {
                     lastError = err;
-                    // If it's the last retry, throw
                     if (i === retries - 1) throw err;
-
-                    // Update UI
                     const loaderSubtitle = document.querySelector('#loader p');
                     if (loaderSubtitle) loaderSubtitle.innerText = `Servidores ocupados. Reintentando (${i+1}/${retries})...`;
-                    
-                    console.warn(`Retry ${i+1}/${retries} due to: ${err.message}`);
                     await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 1.5; // Exponential backoff
+                    delay *= 1.5; 
                 }
             }
-            
             if (lastError) throw lastError;
-            return lastResponse;
         }
 
-        // --- GENERACIÓN DE PLAN (CORE LOGIC) ---
-        async function generatePlan(e) {
-            e.preventDefault();
-            
-            if (dailyQuota.remaining <= 0) {
-                showToast("Has alcanzado tu límite diario.");
-                return;
-            }
+        async function generatePlan(e, isModification = false, modificationRequest = "") {
+            if(e) e.preventDefault();
+            if (dailyQuota.remaining <= 0) { showToast("Has alcanzado tu límite diario."); return; }
 
             const subject = document.getElementById('subject').value;
             const groupDetails = document.getElementById('groupDetails').value;
-            // FIX: Permitir que el estilo sea por defecto si está vacío, pero visualmente obliga a seleccionar
-            let style = document.getElementById('teachingStyle').value;
-            if(!style) style = "Por Competencias"; // Fallback interno
-            
+            let style = document.getElementById('teachingStyle').value || "Por Competencias";
             const topics = document.getElementById('topics').value;
             const daysCount = parseInt(document.getElementById('selectedDays').value);
             const extraInstructions = document.getElementById('customInstructions').value;
 
-            // Prompt diseñado para devolver JSON
-            const systemInstruction = `
+            // Detección automática de idioma
+            const subjectLower = subject.toLowerCase();
+            let langInstruction = "";
+            if (subjectLower.includes("ingles") || subjectLower.includes("english")) {
+                langInstruction = "CRITICAL: GENERATE THE CONTENT IN ENGLISH.";
+            } else if (subjectLower.includes("frances") || subjectLower.includes("french") || subjectLower.includes("francais")) {
+                langInstruction = "CRITICAL: GENERATE THE CONTENT IN FRENCH.";
+            }
+
+            // System Prompt dinámico
+            let baseInstruction = `
             Eres un planificador docente experto.
             Genera una planificación docente para ${daysCount} días.
             Asignatura: ${subject}
             Grupo: ${groupDetails}
             Tema(s): ${topics}
             Estilo: ${style}
-            ${extraInstructions ? "Instrucciones Extra: " + extraInstructions : ""}
-            ${attachedImages.length > 0 ? "Nota: Se adjuntaron imágenes de referencia, úsalas en la planificación si es relevante." : ""}
-
-            IMPORTANTE: DEBES GENERAR LOS 5 DÍAS SOLICITADOS SI EL USUARIO LOS PIDEN.
-            Si el contenido es muy largo, REDUCE la longitud de las descripciones para asegurar que la respuesta completa (JSON cerrado) quepa en el límite de tokens. Prioriza completar la ESTRUCTURA de los 5 días sobre el detalle excesivo.
-
-            REGLA PRINCIPAL DE TIEMPO: La suma de las actividades de INICIO, DESARROLLO y CIERRE debe ser de un total de 60 minutos (1 hora de clase).
-
-            REGLAS DE ESTILO Y NOMENCLATURA:
-            1. TEMAS PUNTUALES: El "tema" de cada día debe ser breve.
-            2. TIEMPO AL INICIO: En cada actividad, pon el tiempo PRIMERO entre paréntesis. Ejemplo: "(10 min) Lluvia de ideas...".
-            3. TEXTO DIRECTO: Describe las actividades de forma fluida.
-            4. SIN TÍTULOS DE FANTASÍA.
-            5. PREGUNTAS DIRECTAS.
-            6. FORMATO JSON SEGURO: Dentro de los textos, usa comillas simples (') para evitar romper el JSON.
-
-            IMPORTANTE: RESPONDE ÚNICAMENTE CON UN OBJETO JSON VÁLIDO.
             
-            Estructura requerida:
+            ${langInstruction}
+            
+            MODO DE RESPUESTA: DETALLADO PERO CONCISO.
+            Desarrolla las actividades con detalle pedagógico estándar, explicando claramente la dinámica.
+
+            ${attachedDocsText ? "CONTEXTO DE DOCUMENTOS ADJUNTOS (Usa esto para crear las actividades): " + attachedDocsText : ""}
+            ${extraInstructions ? "Instrucciones Extra: " + extraInstructions : ""}
+            ${attachedImages.length > 0 ? "Nota: Se adjuntaron imágenes de referencia." : ""}
+
+            REGLA PRINCIPAL: La suma total debe ser 60 minutos aprox.
+            REGLAS DE FORMATO:
+            1. PROHIBIDO TÍTULOS EN ACTIVIDADES (Ej: NO pongas "Actividad 1:", "Juego:", "Warm-up:"). Solo describe la acción.
+            2. TIEMPO SIEMPRE AL INICIO entre paréntesis.
+            3. RESPONDE SOLO CON UN OBJETO JSON VÁLIDO.
+            
+            Estructura requerida JSON:
             {
               "asignatura": "${subject}",
               "unidad": "Nombre formal de la unidad",
-              "lunes": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." },
-              "martes": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." },
-              "miercoles": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." },
-              "jueves": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." },
-              "viernes": { "tema": "...", "inicio": "...", "desarrollo": "...", "cierre": "...", "tarea": "..." }
+              "lunes": { 
+                  "tema": "...", 
+                  "inicio": "...", 
+                  "desarrollo": "...", 
+                  "cierre": "...", 
+                  "materiales_docente": "...", 
+                  "recursos_alumno": "...", 
+                  "tarea": "..." 
+              },
+              ... (hasta ${daysCount} días)
             }
-            
-            Si se piden menos de 5 días, deja las claves de los días no usados como cadenas vacías.
             `;
 
-            const userPrompt = `Generar plan de ${daysCount} días para ${subject}.`;
+            let finalPrompt = "";
+            if (isModification && currentPlanData) {
+                baseInstruction += `\n\nPLAN ACTUAL JSON: ${JSON.stringify(currentPlanData)}`;
+                finalPrompt = `El usuario quiere modificar el plan actual con esta solicitud: "${modificationRequest}". Genera el nuevo JSON completo con los cambios aplicados.`;
+            } else {
+                finalPrompt = `Generar plan de ${daysCount} días para ${subject}.`;
+            }
 
             document.getElementById('loader').classList.remove('hidden');
-            document.getElementById('result-placeholder').classList.add('hidden');
-            document.getElementById('result-content').classList.add('hidden');
+            if(!isModification) {
+                document.getElementById('result-placeholder').classList.add('hidden');
+                document.getElementById('result-content').classList.add('hidden');
+            }
             document.getElementById('btn-generate').disabled = true;
-            
-            currentPlanData = null;
 
             try {
-                const payload = { prompt: userPrompt, systemInstruction: systemInstruction };
+                const payload = { prompt: finalPrompt, systemInstruction: baseInstruction };
                 if (attachedImages.length > 0) payload.images = attachedImages;
 
                 const response = await fetchWithRetry(API_GEN_URL, {
@@ -1213,107 +1173,49 @@
                     body: JSON.stringify(payload)
                 });
 
-                if (!response.ok) {
-                    if (response.status === 503 || response.status === 429) {
-                        throw new Error("Model overloaded");
-                    }
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error("Error HTTP: " + response.status);
                 const data = await response.json();
-                
-                if(!data.success) {
-                    throw new Error(data.error || "Error desconocido.");
-                }
+                if(!data.success) throw new Error(data.error || "Error desconocido.");
 
-                // LIMPIEZA Y PARSING ROBUSTO
-                let cleanText = data.text;
-                cleanText = cleanText.replace(/```json/gi, '').replace(/```/g, '').trim();
-                
-                const startIndex = cleanText.indexOf('{');
-                if (startIndex === -1) throw new Error("No se encontró un bloque JSON válido.");
-                
-                // Intento 1: Extracción estricta (asumiendo que hay un cierre })
-                const lastIndex = cleanText.lastIndexOf('}');
-                let jsonCandidate = "";
-                
-                if (lastIndex > startIndex) {
-                    jsonCandidate = cleanText.substring(startIndex, lastIndex + 1);
-                } else {
-                    // Si no hay cierre, tomamos todo hasta el final (truncado severo)
-                    jsonCandidate = cleanText.substring(startIndex);
-                }
-
-                // Corrección de coma inicial
+                let cleanText = data.text.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const start = cleanText.indexOf('{');
+                const end = cleanText.lastIndexOf('}');
+                if (start === -1) throw new Error("No se encontró un bloque JSON válido.");
+                let jsonCandidate = end > start ? cleanText.substring(start, end + 1) : cleanText.substring(start);
                 jsonCandidate = jsonCandidate.replace(/\{\s*,/g, '{');
 
                 try {
-                    // La data es generada por la herramienta
                     currentPlanData = JSON5.parse(jsonCandidate);
                 } catch (e) {
-                    // SI FALLA: Estrategia de Reparación por Truncamiento
-                    console.warn("JSON inicial inválido, intentando reparar...", e.message);
-                    
-                    // Si falló el estricto, puede ser que el lastIndex fuera interno y no el final real (si estaba truncado).
-                    // Probamos tomando TODO el texto restante y cerrando llaves.
-                    let looseCandidate = cleanText.substring(startIndex);
+                    console.warn("Intentando reparar JSON...", e);
+                    // Lógica de reparación básica
+                    let loose = cleanText.substring(start);
                     let repaired = false;
-
-                    // Intentamos cerrar hasta 5 llaves (ej: root -> lunes -> inicio)
-                    let suffix = "";
-                    for(let i=0; i<10; i++) { // Intentar cerrar brackets/llaves
-                        suffix += "}";
-                        try {
-                            currentPlanData = JSON5.parse(looseCandidate + suffix);
-                            repaired = true;
-                            break;
-                        } catch(err) {
-                            // Si falla, probar cerrar comillas primero
-                             try {
-                                currentPlanData = JSON5.parse(looseCandidate + '"' + suffix);
-                                repaired = true;
-                                break;
-                            } catch(err2) { /* continue */ }
-                        }
+                    for(let i=0; i<6; i++) {
+                        try { currentPlanData = JSON5.parse(loose + "}".repeat(i)); repaired=true; break; } catch(err){}
                     }
-                    
-                    if (!repaired) {
-                        // Último intento: Usar el candidato estricto original y tratar de cerrarlo
-                        // (Por si había texto basura al final que confundió al looseCandidate)
-                        suffix = "";
-                        for(let i=0; i<5; i++) {
-                            suffix += "}";
-                            try {
-                                currentPlanData = JSON5.parse(jsonCandidate + suffix);
-                                repaired = true;
-                                break;
-                            } catch(err) {}
-                        }
-                    }
-
-                    if (!repaired) throw new Error("El sistema generó una respuesta incompleta que no se pudo reparar automáticamente.");
+                    if(!repaired) throw new Error("Error procesando respuesta del sistema.");
                 }
-                
-                // Si llegamos aquí, currentPlanData tiene datos válidos (reparados o no)
+
                 renderEditor(currentPlanData, daysCount);
 
-                // Registrar uso
-                fetch(API_AUTH_URL, {
-                    method: 'POST',
-                    redirect: 'follow',
-                    body: JSON.stringify({ action: 'registerPlannerUsage', username: currentUser })
-                }).then(res => res.json()).then(regData => {
-                     if(regData.success) {
-                         dailyQuota.remaining = Math.max(0, dailyQuota.remaining - 1);
-                         updateQuotaDisplay();
-                     }
-                });
+                if(!isModification) {
+                    fetch(API_AUTH_URL, {
+                        method: 'POST',
+                        redirect: 'follow',
+                        body: JSON.stringify({ action: 'registerPlannerUsage', username: currentUser })
+                    }).then(res => res.json()).then(regData => {
+                        if(regData.success) { dailyQuota.remaining = Math.max(0, dailyQuota.remaining - 1); updateQuotaDisplay(); }
+                    });
+                }
 
                 document.getElementById('loader').classList.add('hidden');
                 const resCont = document.getElementById('result-content');
                 resCont.classList.remove('hidden');
                 resCont.classList.add('flex');
                 requestAnimationFrame(() => resCont.classList.remove('translate-y-4', 'opacity-0'));
+                
+                document.getElementById('btn-modify').classList.remove('hidden');
                 
                 const fileInput = document.getElementById('template-upload');
                 if (fileInput.files.length > 0) {
@@ -1323,25 +1225,13 @@
             } catch (error) {
                 console.error("ERROR:", error);
                 document.getElementById('loader').classList.add('hidden');
-                document.getElementById('result-placeholder').classList.remove('hidden');
-                
-                const errorMsg = error.message ? error.message.toLowerCase() : "";
-                if (errorMsg.includes("overloaded") || errorMsg.includes("capacity") || errorMsg.includes("503") || errorMsg.includes("429")) {
-                    showToast("⚠️ Servidores saturados. Reintentando...");
-                } else {
-                    showToast("Error: " + error.message);
-                }
+                if(!isModification) document.getElementById('result-placeholder').classList.remove('hidden');
+                showToast("Error: " + error.message);
             } finally {
-                const loaderTitle = document.querySelector('#loader h3');
-                const loaderSubtitle = document.querySelector('#loader p');
-                if (loaderTitle) loaderTitle.innerText = "Analizando Recursos...";
-                if (loaderSubtitle) loaderSubtitle.innerText = "Creando actividades personalizadas...";
-                
                 document.getElementById('btn-generate').disabled = false;
             }
         }
 
-        // --- RENDERIZADO DEL EDITOR (TARJETAS) ---
         function renderEditor(data, daysCount) {
             const container = document.getElementById('editor-container');
             container.innerHTML = '';
@@ -1362,168 +1252,93 @@
                 card.className = 'plan-card';
                 card.innerHTML = `
                     <h3 class="day-header">${dayInfo.label}</h3>
-                    
-                    <label class="section-label">Tema / Contenido</label>
-                    <textarea id="topic_${dayInfo.key}" class="editable-field field-topic" placeholder="Tema del día...">${dayData.tema || ''}</textarea>
-                    
-                    <label class="section-label">1. INICIO (Secuencia Didáctica)</label>
-                    <textarea id="inicio_${dayInfo.key}" class="editable-field" style="height: 5rem;" placeholder="Actividades de inicio (X min)...">${dayData.inicio || ''}</textarea>
-                    
-                    <label class="section-label">2. DESARROLLO (Secuencia Didáctica)</label>
-                    <textarea id="desarrollo_${dayInfo.key}" class="editable-field" style="height: 8rem;" placeholder="Actividades clave del desarrollo...">${dayData.desarrollo || ''}</textarea>
-                    
-                    <label class="section-label">3. CIERRE (Secuencia Didáctica)</label>
-                    <textarea id="cierre_${dayInfo.key}" class="editable-field" style="height: 5rem;" placeholder="Actividades de cierre y evaluación (X min)...">${dayData.cierre || ''}</textarea>
-
-                    <label class="section-label">TAREA (Opcional)</label>
-                    <textarea id="tarea_${dayInfo.key}" class="editable-field" style="height: 3rem;" placeholder="Tarea para casa o actividad extra...">${dayData.tarea || ''}</textarea>
+                    <label class="section-label">Tema / Contenido</label><textarea id="topic_${dayInfo.key}" class="editable-field field-topic">${dayData.tema || ''}</textarea>
+                    <label class="section-label">1. INICIO</label><textarea id="inicio_${dayInfo.key}" class="editable-field" style="height: 5rem;">${dayData.inicio || ''}</textarea>
+                    <label class="section-label">2. DESARROLLO</label><textarea id="desarrollo_${dayInfo.key}" class="editable-field" style="height: 8rem;">${dayData.desarrollo || ''}</textarea>
+                    <label class="section-label">3. CIERRE</label><textarea id="cierre_${dayInfo.key}" class="editable-field" style="height: 5rem;">${dayData.cierre || ''}</textarea>
+                    <label class="section-label">MATERIALES DOCENTE</label><textarea id="materiales_docente_${dayInfo.key}" class="editable-field field-materials">${dayData.materiales_docente || ''}</textarea>
+                    <label class="section-label">RECURSOS ALUMNO</label><textarea id="recursos_alumno_${dayInfo.key}" class="editable-field field-materials">${dayData.recursos_alumno || ''}</textarea>
+                    <label class="section-label">TAREA</label><textarea id="tarea_${dayInfo.key}" class="editable-field" style="height: 3rem;">${dayData.tarea || ''}</textarea>
                 `;
                 container.appendChild(card);
             }
         }
 
-        // --- DESCARGA WORD ---
-        // FIX FUNCIONAL: Lógica robusta para evitar errores si faltan campos
         function getValueOrEmpty(id) {
             const el = document.getElementById(id);
-            if (el) {
-                return el.value || ''; // Si existe pero es null/undefined, retorna ''
-            }
-            return ''; // Si no existe el elemento, retorna ''
+            return el ? el.value || '' : '';
         }
 
         function downloadWord() {
             const fileInput = document.getElementById('template-upload');
             const btn = document.getElementById('btn-download-word');
 
-            if (fileInput.files.length === 0) {
-                showToast("Sube tu plantilla .docx primero");
-                return;
-            }
+            if (fileInput.files.length === 0) { showToast("Sube tu plantilla .docx primero"); return; }
 
-            // Aplicar animación de feedback
             btn.classList.add('animate-success-feedback');
-            setTimeout(() => {
-                btn.classList.remove('animate-success-feedback');
-            }, 300);
+            setTimeout(() => { btn.classList.remove('animate-success-feedback'); }, 300);
 
-
-            // La data es generada por la herramienta
             const safePlanData = currentPlanData || {};
-            
-            // Usamos getValueOrEmpty para garantizar que no haya nulls
             const finalData = {
-                // Información general
                 asignatura: getValueOrEmpty('subject'),
                 unidad: safePlanData.unidad || "Unidad no definida",
-                // Lunes
-                tema_lunes: getValueOrEmpty('topic_lunes'),
-                inicio_lunes: getValueOrEmpty('inicio_lunes'),
-                desarrollo_lunes: getValueOrEmpty('desarrollo_lunes'),
-                cierre_lunes: getValueOrEmpty('cierre_lunes'),
-                tarea_lunes: getValueOrEmpty('tarea_lunes'),
-                // Martes
-                tema_martes: getValueOrEmpty('topic_martes'),
-                inicio_martes: getValueOrEmpty('inicio_martes'),
-                desarrollo_martes: getValueOrEmpty('desarrollo_martes'),
-                cierre_martes: getValueOrEmpty('cierre_martes'),
-                tarea_martes: getValueOrEmpty('tarea_martes'),
-                // Miércoles
-                tema_miercoles: getValueOrEmpty('topic_miercoles'),
-                inicio_miercoles: getValueOrEmpty('inicio_miercoles'),
-                desarrollo_miercoles: getValueOrEmpty('desarrollo_miercoles'),
-                cierre_miercoles: getValueOrEmpty('cierre_miercoles'),
-                tarea_miercoles: getValueOrEmpty('tarea_miercoles'),
-                // Jueves
-                tema_jueves: getValueOrEmpty('topic_jueves'),
-                inicio_jueves: getValueOrEmpty('inicio_jueves'),
-                desarrollo_jueves: getValueOrEmpty('desarrollo_jueves'),
-                cierre_jueves: getValueOrEmpty('cierre_jueves'),
-                tarea_jueves: getValueOrEmpty('tarea_jueves'),
-                // Viernes
-                tema_viernes: getValueOrEmpty('topic_viernes'),
-                inicio_viernes: getValueOrEmpty('inicio_viernes'),
-                desarrollo_viernes: getValueOrEmpty('desarrollo_viernes'),
-                cierre_viernes: getValueOrEmpty('cierre_viernes'),
-                tarea_viernes: getValueOrEmpty('tarea_viernes'),
+                tema_lunes: getValueOrEmpty('topic_lunes'), inicio_lunes: getValueOrEmpty('inicio_lunes'), desarrollo_lunes: getValueOrEmpty('desarrollo_lunes'), cierre_lunes: getValueOrEmpty('cierre_lunes'), materiales_docente_lunes: getValueOrEmpty('materiales_docente_lunes'), recursos_alumno_lunes: getValueOrEmpty('recursos_alumno_lunes'), tarea_lunes: getValueOrEmpty('tarea_lunes'),
+                tema_martes: getValueOrEmpty('topic_martes'), inicio_martes: getValueOrEmpty('inicio_martes'), desarrollo_martes: getValueOrEmpty('desarrollo_martes'), cierre_martes: getValueOrEmpty('cierre_martes'), materiales_docente_martes: getValueOrEmpty('materiales_docente_martes'), recursos_alumno_martes: getValueOrEmpty('recursos_alumno_martes'), tarea_martes: getValueOrEmpty('tarea_martes'),
+                tema_miercoles: getValueOrEmpty('topic_miercoles'), inicio_miercoles: getValueOrEmpty('inicio_miercoles'), desarrollo_miercoles: getValueOrEmpty('desarrollo_miercoles'), cierre_miercoles: getValueOrEmpty('cierre_miercoles'), materiales_docente_miercoles: getValueOrEmpty('materiales_docente_miercoles'), recursos_alumno_miercoles: getValueOrEmpty('recursos_alumno_miercoles'), tarea_miercoles: getValueOrEmpty('tarea_miercoles'),
+                tema_jueves: getValueOrEmpty('topic_jueves'), inicio_jueves: getValueOrEmpty('inicio_jueves'), desarrollo_jueves: getValueOrEmpty('desarrollo_jueves'), cierre_jueves: getValueOrEmpty('cierre_jueves'), materiales_docente_jueves: getValueOrEmpty('materiales_docente_jueves'), recursos_alumno_jueves: getValueOrEmpty('recursos_alumno_jueves'), tarea_jueves: getValueOrEmpty('tarea_jueves'),
+                tema_viernes: getValueOrEmpty('topic_viernes'), inicio_viernes: getValueOrEmpty('inicio_viernes'), desarrollo_viernes: getValueOrEmpty('desarrollo_viernes'), cierre_viernes: getValueOrEmpty('cierre_viernes'), materiales_docente_viernes: getValueOrEmpty('materiales_docente_viernes'), recursos_alumno_viernes: getValueOrEmpty('recursos_alumno_viernes'), tarea_viernes: getValueOrEmpty('tarea_viernes'),
             };
 
             const reader = new FileReader();
+            
+            // FIX: Usar ArrayBuffer en lugar de BinaryString para mayor compatibilidad
+            reader.readAsArrayBuffer(fileInput.files[0]);
+
             reader.onload = function(evt) {
                 try {
-                    if (typeof window.PizZip !== 'function') {
-                         throw new Error("La librería PizZip no se ha cargado correctamente.");
-                    }
-
-                    const zip = new window.PizZip(evt.target.result);
-                    const doc = new window.docxtemplater(zip, {
-                        paragraphLoop: true,
+                    // Cargar contenido con PizZip
+                    const content = evt.target.result;
+                    const zip = new PizZip(content);
+                    
+                    const doc = new window.docxtemplater(zip, { 
+                        paragraphLoop: true, 
                         linebreaks: true,
-                        // nullGetter previene errores si algún dato se escapó como null
-                        nullGetter: function(part) { return ""; }
+                        nullGetter: function(part) { return ""; } 
                     });
-
+                    
                     doc.render(finalData);
-
+                    
+                    // Generar blob
                     const out = doc.getZip().generate({
                         type: "blob",
                         mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     });
-
-                    // --- INICIO DE MODIFICACIÓN: NOMBRE PERSONALIZADO (ABREVIADO) ---
-                    // Formato deseado: 3P-LE | DD-DD NOV.
                     
-                    // Función auxiliar para abreviar texto
                     const abbreviate = (text) => {
                         if (!text) return "XX";
-                        // Limpia caracteres especiales y espacios extra
                         const clean = text.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, "").trim();
-                        // Palabras comunes a ignorar en las siglas
                         const ignore = ["de", "del", "la", "el", "los", "las", "y", "en"];
-                        
                         const words = clean.split(/\s+/).filter(w => !ignore.includes(w.toLowerCase()) && w.length > 0);
-                        
                         if (words.length === 0) return "XX";
-                        
-                        if (words.length === 1) {
-                            // Si es una sola palabra, toma las primeras 3 letras (ej: Matemáticas -> MAT)
-                            return words[0].substring(0, 3).toUpperCase();
-                        } else {
-                            // Si son varias palabras, toma la inicial de cada una (ej: 3ro Primaria -> 3P)
-                            return words.map(w => w.charAt(0)).join('').toUpperCase();
-                        }
+                        return words.length === 1 ? words[0].substring(0, 3).toUpperCase() : words.map(w => w.charAt(0)).join('').toUpperCase();
                     };
 
-                    // 1. Obtener valores crudos
-                    const rawCurso = getValueOrEmpty('groupDetails');
-                    const rawMateria = getValueOrEmpty('subject');
-                    
-                    // 2. Generar abreviaturas
-                    const cursoAbrev = abbreviate(rawCurso);
-                    const materiaAbrev = abbreviate(rawMateria);
-                    
-                    // 3. Obtener Mes Actual Abreviado
+                    const cursoAbrev = abbreviate(getValueOrEmpty('groupDetails'));
+                    const materiaAbrev = abbreviate(getValueOrEmpty('subject'));
                     const months = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
                     const currentMonth = months[new Date().getMonth()];
-                    
-                    // 4. Construir nombre final
-                    const dynamicFileName = `${cursoAbrev}-${materiaAbrev} | DD-DD ${currentMonth}.docx`;
-                    // --- FIN DE MODIFICACIÓN ---
-
-                    saveAs(out, dynamicFileName);
+                    saveAs(out, `${cursoAbrev}-${materiaAbrev} | DD-DD ${currentMonth}.docx`);
                     showToast("¡Descarga iniciada!");
-
                 } catch (error) {
-                    console.error("Error DocxTemplater:", error);
-                    if (error.properties && error.properties.errors) {
-                        error.properties.errors.forEach(function(err) { console.log(err); });
-                    }
-                    showToast("Error al generar Word. Revisa tu plantilla.");
+                    console.error("Error Word:", error);
+                    showToast("Error al generar Word. ¿El archivo es válido?");
                 }
             };
-            reader.readAsBinaryString(fileInput.files[0]);
+            
+            reader.onerror = function() {
+                showToast("Error al leer el archivo de plantilla.");
+            };
         }
-
     </script>
 </body>
 </html>
