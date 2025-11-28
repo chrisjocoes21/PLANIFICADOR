@@ -341,6 +341,13 @@
             box-shadow: 0 2px 5px rgba(27, 73, 101, 0.2);
         }
 
+        /* Estilos deshabilitados */
+        .disabled-btn {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
     </style>
 </head>
 <body class="text-slate-800 font-sans antialiased">
@@ -423,6 +430,37 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL DE CUPO EXCEDIDO (ESTÁTICO Y SIN ANIMACIÓN) -->
+    <div id="quota-exceeded-modal" class="hidden fixed inset-0 z-[220] flex items-center justify-center bg-black/60 backdrop-blur-md">
+        <!-- Eliminadas transiciones y animaciones para hacerlo estático -->
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 border-2 border-red-100">
+            <div class="text-center">
+                <!-- Icono estático (sin animate-bounce) -->
+                <div class="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-red-100 mb-6">
+                    <svg class="h-10 w-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-2xl font-black text-gray-800 mb-2">¡Límite Mensual Alcanzado!</h3>
+                <p class="text-sm text-gray-500 font-medium mb-6">Has agotado tus generaciones de este mes.</p>
+                
+                <div class="bg-red-50 p-4 rounded-xl border border-red-100 mb-6 text-left">
+                    <p class="text-xs text-red-800 font-semibold mb-2">🚫 Restricciones Activadas:</p>
+                    <ul class="text-xs text-red-700 list-disc list-inside space-y-1">
+                        <li>No puedes generar nuevos planes.</li>
+                        <li>No puedes modificar planes existentes.</li>
+                        <li>El acceso se restablecerá el: <strong id="reset-date-display" class="text-red-900"></strong>.</li>
+                    </ul>
+                </div>
+
+                <!-- Botón que ejecuta logout inmediatamente -->
+                <button type="button" onclick="logout()" class="w-full inline-flex justify-center items-center rounded-xl shadow-lg px-4 py-3 bg-gray-800 text-white font-bold hover:bg-gray-900 transition-colors">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
     
     <!-- MODAL INSTRUCCIONES MEJORADO -->
     <div id="instructions-modal" class="hidden fixed inset-0 z-[250] flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -486,7 +524,7 @@
             </div>
             
             <div class="flex-1 flex flex-col gap-2">
-                <p class="text-xs text-gray-500 font-medium">Describe qué cambios quieres hacer al plan visible actualmente (ej: "Cambia la actividad del martes por algo más lúdico").</p>
+                <p class="text-xs text-gray-500 font-medium">Describe qué cambios quieres hacer al plan visible actualmente (ej: "Cambia la actividad del martes por algo más lúdico"). <span class="text-montessori-red font-bold">*Consume 1 uso diario.</span></p>
                 <textarea id="modification-input" class="w-full flex-1 p-4 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:border-montessori-blue focus:ring-2 focus:ring-montessori-lightBlue outline-none resize-none transition-all" placeholder="Solicita cambios específicos..."></textarea>
             </div>
 
@@ -514,14 +552,14 @@
                 </div>
                 
                 <div class="flex items-center gap-4">
-                    <div class="flex flex-col items-end mr-2">
+                    <div class="flex flex-col items-center mr-2">
                          <div class="flex items-center gap-1">
                              <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-tight">Hola,</span>
                              <span id="user-name-display" class="text-xs font-black text-montessori-blue leading-tight max-w-[150px] truncate text-right">Usuario</span>
                          </div>
                          <div class="bg-montessori-lightBlue px-3 py-1 rounded-lg mt-1 border border-montessori-lightBlue/50 flex items-center justify-center gap-2 h-6" id="quota-badge">
-                             <span class="text-[10px] font-bold text-gray-500 uppercase leading-none">Usos hoy:</span>
-                             <span id="usage-counter" class="text-xs font-black text-montessori-red leading-none pt-[1px]">...</span>
+                             <span class="text-[9px] font-bold text-slate-500 uppercase leading-none">Usos mes:</span>
+                             <span id="usage-counter" class="text-xs font-black text-montessori-blue leading-none pt-[1px]">...</span>
                          </div>
                     </div>
                     <button onclick="logout()" class="p-2 text-montessori-red/70 hover:text-montessori-red hover:bg-red-50 rounded-full transition-colors" title="Cerrar Sesión">
@@ -701,11 +739,12 @@
         
         let selectedDays = 5;
         let currentUser = null;
-        let dailyQuota = { remaining: 0, total: 0 };
+        let userQuota = { remaining: 0, total: 0 };
         let attachedImages = [];
         let attachedDocsText = ""; 
         const MAX_IMAGES = 12; // Límite aumentado
         let currentPlanData = null;
+        let quotaPollInterval = null;
 
         // --- PARTÍCULAS DEL FONDO ---
         const symbols = ['Inicio', 'Desarrollo', 'Cierre', 'Obj.', 'Meta', 'Tiempo', 'Recursos', 'Eval.', 'Actividad', 'Plan', 'Clase'];
@@ -803,8 +842,8 @@
                                 loginTime: new Date().getTime()
                             };
                             sessionStorage.setItem('pinceladas_session', JSON.stringify(sessionData));
-                            dailyQuota.remaining = quotaData.remaining;
-                            dailyQuota.total = quotaData.limit;
+                            userQuota.remaining = quotaData.remaining;
+                            userQuota.total = quotaData.limit;
                             loginUserSuccess(data.name, data.usernameUnique, false);
                         }
                     } else {
@@ -833,6 +872,26 @@
             }, 10);
         }
 
+        // --- LÓGICA MODAL ESTÁTICO DE CUPO ---
+        function showQuotaExceededModal() {
+            const modal = document.getElementById('quota-exceeded-modal');
+            if(modal.classList.contains('hidden')) {
+                // Calcular fecha: 1 del próximo mes
+                const now = new Date();
+                const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('reset-date-display').innerText = nextMonth.toLocaleDateString('es-ES', options);
+
+                modal.classList.remove('hidden');
+                
+                // Bloqueo visual de botones
+                const btnGen = document.getElementById('btn-generate');
+                const btnMod = document.getElementById('btn-modify');
+                if(btnGen) btnGen.classList.add('disabled-btn');
+                if(btnMod) btnMod.classList.add('disabled-btn');
+            }
+        }
+
         function loginUserSuccess(name, usernameUnique, isAutoLogin) {
             currentUser = usernameUnique;
             document.getElementById('user-name-display').innerText = name; 
@@ -851,6 +910,11 @@
                 setTimeout(() => loader.classList.add('hidden'), 700);
             }
 
+            // CRITICAL CHECK: Si entra con 0 cupo, bloquear de inmediato
+            if (userQuota.remaining <= 0 && userQuota.total > 0) {
+                 showQuotaExceededModal();
+            }
+
             appContent.classList.remove('hidden');
             setTimeout(() => {
                 appContent.classList.remove('opacity-0');
@@ -858,10 +922,17 @@
                 initDropdowns(); 
                 selectDays(selectedDays); 
             }, 100);
+
+            // Iniciar Polling de Cuota (Cada 30 segs)
+            if (quotaPollInterval) clearInterval(quotaPollInterval);
+            quotaPollInterval = setInterval(() => {
+                if(currentUser) refreshQuota(currentUser);
+            }, 30000); 
         }
 
         function logout() {
             sessionStorage.removeItem('pinceladas_session');
+            if (quotaPollInterval) clearInterval(quotaPollInterval);
             location.reload();
         }
 
@@ -869,24 +940,62 @@
             try {
                 const response = await fetch(`${API_AUTH_URL}?action=checkPlannerQuota&username=${encodeURIComponent(username)}`);
                 const data = await response.json();
-                if(data.success && !data.restricted) {
-                    dailyQuota.remaining = data.remaining;
-                    dailyQuota.total = data.limit;
-                    updateQuotaDisplay();
-                } else if (data.restricted) {
-                    logout();
+                if(data.success) {
+                    if (data.restricted) {
+                        // Si se restringe mientras usa (polling), bloquear y mostrar modal para logout
+                        userQuota.remaining = 0;
+                        checkQuotaLimits(); 
+                    } else {
+                        userQuota.remaining = data.remaining;
+                        userQuota.total = data.limit;
+                        updateQuotaDisplay();
+                        checkQuotaLimits(); 
+                    }
                 }
             } catch(e) { console.error("Error refrescando cuota", e); }
         }
 
         function updateQuotaDisplay() {
             const counter = document.getElementById('usage-counter');
-            if(dailyQuota.total > 0) {
-                counter.innerText = `${dailyQuota.remaining} / ${dailyQuota.total}`;
-                if(dailyQuota.remaining === 0) counter.className = "text-[10px] font-black text-montessori-red";
-                else counter.className = "text-[10px] font-black text-montessori-blue";
+            if(userQuota.total > 0) {
+                counter.innerText = `${userQuota.remaining} / ${userQuota.total}`;
+                if(userQuota.remaining <= 0) {
+                    counter.className = "text-xs font-black text-red-500";
+                } else {
+                    counter.className = "text-xs font-black text-montessori-blue leading-none pt-[1px]";
+                }
             } else {
                 counter.innerText = "...";
+            }
+        }
+
+        function checkQuotaLimits() {
+            const btnGen = document.getElementById('btn-generate');
+            const btnMod = document.getElementById('btn-modify');
+
+            if (userQuota.remaining <= 0) {
+                if(btnGen) {
+                    btnGen.disabled = true;
+                    btnGen.classList.add('disabled-btn');
+                    btnGen.innerHTML = `<span class="relative z-10 flex items-center gap-2">LÍMITE ALCANZADO</span>`;
+                }
+                if(btnMod) {
+                    btnMod.disabled = true;
+                    btnMod.classList.add('disabled-btn');
+                }
+                showQuotaExceededModal(); // Mostrar modal estático
+            } else {
+                // Restaurar estado si se recarga cupo
+                if(btnGen && btnGen.disabled) {
+                    btnGen.disabled = false;
+                    btnGen.classList.remove('disabled-btn');
+                    btnGen.innerHTML = `<span class="relative z-10 flex items-center gap-2">GENERAR PLAN</span><div class="absolute inset-0 h-full w-full scale-0 rounded-2xl transition-all duration-300 group-hover:scale-100 group-hover:bg-white/10"></div>`;
+                }
+                if(btnMod && btnMod.disabled) {
+                    btnMod.disabled = false;
+                    btnMod.classList.remove('disabled-btn');
+                }
+                // No ocultamos modal automáticamente si ya salió para forzar el logout manual
             }
         }
 
@@ -938,7 +1047,7 @@
                 } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
                     try {
                         const text = await extractTextFromDocx(file);
-                        attachedDocsText += `\n\n--- CONTENIDO DOCX (${file.name}) ---\n${text.substring(0, 15000)}... [Truncado]`;
+                        attachedDocsText += `\n\n--- CONTENIDO DOCX (${file.name}) ---\n${text.substring(0, 15000)}... [Truncado]`; 
                         renderDocPreview(file.name, 'DOCX');
                     } catch(e){ showToast("Error leyendo DOCX"); }
                 }
@@ -1022,9 +1131,23 @@
             }
         }
 
-        function toggleModificationModal() { document.getElementById('modification-modal').classList.toggle('hidden'); }
+        function toggleModificationModal() { 
+            // Verificación estricta de cupo antes de abrir modal
+            if (userQuota.remaining <= 0) {
+                showQuotaExceededModal();
+                return;
+            }
+            document.getElementById('modification-modal').classList.toggle('hidden'); 
+        }
         
         async function applyModification() {
+            // Verificación estricta de cupo
+            if (userQuota.remaining <= 0) {
+                showQuotaExceededModal();
+                toggleModificationModal(); // Cerrar modal de input
+                return;
+            }
+
             const request = document.getElementById('modification-input').value;
             if(!request) return;
             toggleModificationModal();
@@ -1088,7 +1211,12 @@
 
         async function generatePlan(e, isModification = false, modificationRequest = "") {
             if(e) e.preventDefault();
-            if (dailyQuota.remaining <= 0) { showToast("Has alcanzado tu límite diario."); return; }
+            
+            // 1. CHEQUEO ESTRICTO DE CUOTA AL INICIO
+            if (userQuota.remaining <= 0) { 
+                showQuotaExceededModal(); 
+                return; 
+            }
 
             const subject = document.getElementById('subject').value;
             const groupDetails = document.getElementById('groupDetails').value;
@@ -1199,15 +1327,19 @@
 
                 renderEditor(currentPlanData, daysCount);
 
-                if(!isModification) {
-                    fetch(API_AUTH_URL, {
-                        method: 'POST',
-                        redirect: 'follow',
-                        body: JSON.stringify({ action: 'registerPlannerUsage', username: currentUser })
-                    }).then(res => res.json()).then(regData => {
-                        if(regData.success) { dailyQuota.remaining = Math.max(0, dailyQuota.remaining - 1); updateQuotaDisplay(); }
-                    });
-                }
+                // 2. DESCUENTO DE CUOTA SIEMPRE (GENERACIÓN O MODIFICACIÓN)
+                fetch(API_AUTH_URL, {
+                    method: 'POST',
+                    redirect: 'follow',
+                    body: JSON.stringify({ action: 'registerPlannerUsage', username: currentUser })
+                }).then(res => res.json()).then(regData => {
+                    if(regData.success) { 
+                        // Actualizar con el valor real del servidor si viene, sino estimar localmente
+                        userQuota.remaining = (regData.remaining !== undefined) ? regData.remaining : Math.max(0, userQuota.remaining - 1);
+                        updateQuotaDisplay();
+                        checkQuotaLimits(); // Validar si quedó en 0 tras este uso
+                    }
+                });
 
                 document.getElementById('loader').classList.add('hidden');
                 const resCont = document.getElementById('result-content');
@@ -1228,7 +1360,12 @@
                 if(!isModification) document.getElementById('result-placeholder').classList.remove('hidden');
                 showToast("Error: " + error.message);
             } finally {
-                document.getElementById('btn-generate').disabled = false;
+                // Solo rehabilitar si aún hay cupo
+                if(userQuota.remaining > 0) {
+                    document.getElementById('btn-generate').disabled = false;
+                } else {
+                    checkQuotaLimits();
+                }
             }
         }
 
